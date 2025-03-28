@@ -1,13 +1,16 @@
 {
-  "homepage":{
-    "https://whowon.xyz"
-  }
+  "homepage": "https://whowon.xyz",
   "dependencies": {
     "react": "18.0.0",
     "react-dom": "18.0.0"
   },
-  "scripts":{
-    "predeploy" : "npm run build",
-    "deploy" : "gh-pages -d build" 
+  "scripts": {
+    "start": "react-scripts start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "build": "react-scripts build"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
