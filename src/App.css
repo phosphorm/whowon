@@ -5,17 +5,14 @@
 html, body {
   margin: 0;
   padding: 0;
-  /* Hide minor horizontal overflow if it occurs */
-  overflow-x: hidden;
+  overflow-x: hidden; /* Hide minor horizontal overflow if it occurs */
   background-color: #0d0d0d; /* nearly black background */
   color: #f0f0f0;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
 }
 
-/*
-  Main container: up to 900px wide, centered horizontally, with padding.
-*/
+/* Main container: up to 900px wide, centered horizontally, with padding. */
 .app {
   max-width: 900px;
   margin: 0 auto;
@@ -24,10 +21,8 @@ html, body {
   z-index: 0;
 }
 
-/*
-  Subtle animated background gradient behind everything,
-  using ::before so it doesn't affect layout.
-*/
+/* Subtle animated background gradient behind everything, 
+   using ::before so it doesn't affect layout. */
 .app::before {
   content: "";
   position: fixed; /* stays fixed in the viewport */
@@ -37,7 +32,6 @@ html, body {
   height: 100%;
   z-index: -1;
   background: radial-gradient(circle at 50% 50%, rgba(0,255,0,0.07), transparent 70%);
-  /* Gentle "pulse" animation */
   animation: subtleBg 10s ease-in-out infinite alternate;
 }
 
@@ -82,28 +76,27 @@ html, body {
   color: #fff;
 }
 
-/* Main content layout:
-   flex with wrap, but ensure columns stretch equally in height. */
+/* Main content layout: two columns that match in height. */
 .content {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
-  align-items: stretch;  /* so left and right columns match in height */
+  align-items: stretch;
   margin-top: 1rem;
   padding-bottom: 2rem;
 }
-.left, .right {
+.left,
+.right {
   flex: 1 1 0;
   min-width: 280px;
-  display: flex;         /* allow panel inside to stretch */
+  display: flex;
   flex-direction: column;
 }
 .left {
-  flex: 2 1 0; /* left panel is a bit wider by default */
+  flex: 2 1 0; /* left panel is a bit wider */
 }
 
-/* Panels for input and output sections:
-   set them to flex:1 so they fill entire column height. */
+/* Panels for input and output sections */
 .panel {
   background: #1a1a1a;
   border-radius: 8px;
@@ -111,11 +104,12 @@ html, body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  flex: 1;  /* fill the full column height */
+  flex: 1; /* fill column height */
 }
 
 /* Headings */
-h1, h2 {
+h1,
+h2 {
   margin: 0 0 0.5em;
   font-weight: 700;
 }
@@ -175,7 +169,9 @@ h2 {
 }
 
 /* Inputs, textareas, selects */
-input, textarea, select {
+input,
+textarea,
+select {
   width: 100%;
   background-color: #262626;
   border: none;
@@ -186,13 +182,16 @@ input, textarea, select {
   box-sizing: border-box;
   transition: box-shadow 0.3s, background-color 0.3s;
 }
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: #777;
 }
 textarea {
   resize: vertical;
 }
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.5);
 }
@@ -255,8 +254,35 @@ button {
 }
 
 /* 
-  Emphasize the "Winners" field more strongly
-  - green border, subtle glow
+  .original-later, .differences-later, .winners-later 
+  used to reorder results on large vs mobile screens
+*/
+.original-later {
+  order: 1; /* default desktop: appear first */
+}
+.differences-later {
+  order: 2; /* default desktop: second */
+}
+.winners-later {
+  order: 3; /* default desktop: last (bottom) */
+}
+
+/* On smaller screens, show winners-later first, then original, then differences. */
+@media (max-width: 600px) {
+  .winners-later {
+    order: 1;
+  }
+  .original-later {
+    order: 2;
+  }
+  .differences-later {
+    order: 3;
+  }
+}
+
+/* 
+  .winners-field is only added dynamically if winners are picked,
+  causing the green outline and glow. 
 */
 .winners-field {
   border: 2px solid #00ff00;

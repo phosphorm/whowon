@@ -125,11 +125,22 @@ function App() {
     })
     .join("\n");
 
+  /*
+    We'll physically place the "Winners" section at the bottom 
+    of the Results panel, but reorder it on mobile via CSS.
+
+    We also dynamically add the .winners-field class if winners.length > 0.
+    That way, it only glows after at least one winner is picked.
+  */
+
+  // Condition for glow:
+  const winnersBoxClass = `field winners-later ${winners.length > 0 ? 'winners-field' : ''}`;
+
   return (
     <div className="app">
       {/* Header wraps on small screens */}
       <header className="header">
-        {/* Heading changed to "who won?" earlier */}
+        {/* heading is "who won?" */}
         <div className="header-left">who won?</div>
         <div className="header-right">
           {/* Additional links or content could go here */}
@@ -262,7 +273,7 @@ function App() {
               />
             </div>
 
-            {/* Button row - now swapped: Reset is left, Pick Winners is right */}
+            {/* Button row: Reset on the left, Pick Winners on the right */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
               <button type="button" className="secondary-btn" onClick={handleReset}>
                 Reset
@@ -277,7 +288,6 @@ function App() {
         {/* Results Panel */}
         <div className="right panel">
           <h1>Results</h1>
-          {/* We let .results fill all space */}
           <div className="results">
             {timestamp ? (
               <p><strong>Timestamp:</strong> {timestamp}</p>
@@ -285,28 +295,9 @@ function App() {
               <p className="no-winners">No winners picked yet.</p>
             )}
 
-            {/* Emphasized winners field */}
-            <div className="field winners-field">
-              <label htmlFor="winnersOutput">
-                Winners
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    The list of winners in the format ":W: Name - number :W:".
-                  </span>
-                </span>
-              </label>
-              <textarea
-                id="winnersOutput"
-                rows="5"
-                readOnly
-                value={winnersText}
-                placeholder="No winners to display yet..."
-              />
-            </div>
-
-            {/* De-prioritized sections */}
-            <div className="field deprioritized">
+            {/* Original and difference fields first (desktop) 
+                We'll reorder on mobile if needed. */}
+            <div className="field original-later deprioritized">
               <label htmlFor="originalOutput">
                 Original Messages
                 <span className="tooltip">
@@ -325,7 +316,7 @@ function App() {
               />
             </div>
 
-            <div className="field deprioritized">
+            <div className="field differences-later deprioritized">
               <label htmlFor="differencesOutput">
                 Name(s) &amp; Difference
               </label>
@@ -335,6 +326,28 @@ function App() {
                 readOnly
                 value={differencesText}
                 placeholder="No differences to display yet..."
+              />
+            </div>
+
+            {/* The Winners field is physically last in the DOM, 
+                but we reorder on mobile with .winners-later. 
+                We only add .winners-field if there are actual winners. */}
+            <div className={winnersBoxClass}>
+              <label htmlFor="winnersOutput">
+                Winners
+                <span className="tooltip">
+                  <span className="material-icons">info</span>
+                  <span className="tooltiptext">
+                    The list of winners in the format ":W: Name - number :W:".
+                  </span>
+                </span>
+              </label>
+              <textarea
+                id="winnersOutput"
+                rows="5"
+                readOnly
+                value={winnersText}
+                placeholder="No winners to display yet..."
               />
             </div>
           </div>
