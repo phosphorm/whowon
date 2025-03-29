@@ -5,8 +5,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  /* Removed the gray background color to reveal the actual gradient:
-     background-color: #0d0d0d; */
+  background-color: #0d0d0d; /* nearly black background restored */
   color: #f0f0f0;
   font-family: 'Inter', sans-serif;
 }
@@ -27,7 +26,6 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  /* Radial gradient with green glow */
   background: radial-gradient(circle at 0% 50%, rgba(0,255,0,0.07) 0%, transparent 70%) no-repeat;
   z-index: -1;
   animation: moveBg 10s ease-in-out infinite alternate;
@@ -42,7 +40,7 @@ html, body {
   position: sticky;
   top: 0;
   width: 100%;
-  background: #0f0f0f;  /* solid dark background for header */
+  background: #0f0f0f;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -129,7 +127,6 @@ h2 {
   position: relative;
   display: inline-block;
 }
-/* Hidden tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
   opacity: 0;
@@ -140,8 +137,8 @@ h2 {
   border-radius: 4px;
   position: absolute;
   z-index: 100;
-  bottom: 125%; /* position above the icon */
-  right: 0;     /* align text to right of icon */
+  bottom: 125%;
+  right: 0;
   width: max-content;
   max-width: 220px;
   font-size: 0.85em;
@@ -153,7 +150,7 @@ h2 {
   opacity: 1;
 }
 
-/* Input and textarea styling */
+/* Input, textarea, select styling */
 input, textarea, select {
   width: 100%;
   background-color: #262626;
@@ -201,7 +198,7 @@ button {
 .secondary-btn {
   background-color: #444444;
   color: #ffffff;
-  margin-left: 0.5rem;
+  /* Removed margin-left so we can handle spacing in a flex container */
 }
 .secondary-btn:hover {
   background-color: #555555;
@@ -212,14 +209,17 @@ button {
 }
 
 /* Results/output styling */
-.results {
-  /* inherits .panel styles via class "panel" */
-}
-.results label { /* same label styles as inputs */ }
+.results {}
+.results label {}
 .results textarea {}
 .no-winners {
   color: #888;
   font-style: italic;
+}
+/* Visually de-prioritized sections */
+.deprioritized {
+  opacity: 0.7;
+  font-size: 0.9em;
 }
 .results ul {
   list-style: none;

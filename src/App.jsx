@@ -5,8 +5,11 @@ function App() {
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
-  const [tieMode, setTieMode] = useState("first");       // "first" or "all"
+
+  // Tie handling now defaults to "all"
+  const [tieMode, setTieMode] = useState("all");        // "all" or "first"
   const [duplicateMode, setDuplicateMode] = useState("first"); // "first" or "last"
+
   const [whitelist, setWhitelist] = useState("");
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
@@ -109,7 +112,7 @@ function App() {
     setRawData("");
     setWinningNumber("");
     setNumberOfWinners("");
-    setTieMode("first");
+    setTieMode("all");
     setDuplicateMode("first");
     setWhitelist("");
     setWinners([]);
@@ -136,7 +139,7 @@ function App() {
       <header className="header">
         <div className="header-left">Closest Number Picker</div>
         <div className="header-right">
-          {/* Placeholder for navigation or info on the right side */}
+          {/* Placeholder for additional navigation or info */}
         </div>
       </header>
 
@@ -190,7 +193,7 @@ function App() {
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
-                    How many winners to pick (additional ties will be included if tie mode is All).
+                    How many winners to pick (additional ties will be included if tie mode is Include Ties).
                   </span>
                 </span>
               </label>
@@ -204,46 +207,50 @@ function App() {
               />
             </div>
 
-            {/* Tie Mode: Now a dropdown */}
-            <div className="field">
-              <label htmlFor="tieMode">
-                Tie Handling 
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    If multiple entries are equally close: choose only the first N entries or include all tied entries.
+            {/* Side-by-side container for tieMode & duplicateMode */}
+            <div style={{ display: "flex", gap: "1rem" }}>
+              {/* Tie Mode */}
+              <div className="field" style={{ flex: 1 }}>
+                <label htmlFor="tieMode">
+                  Tie Handling 
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      If multiple entries are equally close: choose only the first answer or include ties.
+                    </span>
                   </span>
-                </span>
-              </label>
-              <select
-                id="tieMode"
-                value={tieMode}
-                onChange={(e) => setTieMode(e.target.value)}
-              >
-                <option value="first">First N Only</option>
-                <option value="all">Include All Ties</option>
-              </select>
-            </div>
+                </label>
+                <select
+                  id="tieMode"
+                  value={tieMode}
+                  onChange={(e) => setTieMode(e.target.value)}
+                >
+                  {/* "Include Ties" is first and default */}
+                  <option value="all">Include Ties</option>
+                  <option value="first">First Answer</option>
+                </select>
+              </div>
 
-            {/* Duplicate Handling: Now a dropdown */}
-            <div className="field">
-              <label htmlFor="duplicateMode">
-                Duplicate Handling 
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    If the same name appears multiple times: keep only the first occurrence or the last occurrence.
+              {/* Duplicate Handling */}
+              <div className="field" style={{ flex: 1 }}>
+                <label htmlFor="duplicateMode">
+                  Duplicate Handling 
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      If the same name appears multiple times: keep only the first occurrence or the last occurrence.
+                    </span>
                   </span>
-                </span>
-              </label>
-              <select
-                id="duplicateMode"
-                value={duplicateMode}
-                onChange={(e) => setDuplicateMode(e.target.value)}
-              >
-                <option value="first">Keep First</option>
-                <option value="last">Keep Last</option>
-              </select>
+                </label>
+                <select
+                  id="duplicateMode"
+                  value={duplicateMode}
+                  onChange={(e) => setDuplicateMode(e.target.value)}
+                >
+                  <option value="first">Keep First</option>
+                  <option value="last">Keep Last</option>
+                </select>
+              </div>
             </div>
 
             <div className="field">
@@ -261,13 +268,15 @@ function App() {
                 type="text"
                 value={whitelist}
                 onChange={(e) => setWhitelist(e.target.value)}
-                placeholder="e.g., John, Jane (names to always include all entries)"
+                placeholder="e.g. Marko K, Ville W"
               />
             </div>
 
-            {/* Action Buttons */}
-            <button type="submit" className="primary-btn">Pick Winners</button>
-            <button type="button" className="secondary-btn" onClick={handleReset}>Reset</button>
+            {/* Action Buttons: spaced apart */}
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
+              <button type="submit" className="primary-btn">Pick Winners</button>
+              <button type="button" className="secondary-btn" onClick={handleReset}>Reset</button>
+            </div>
           </form>
         </div>
 
@@ -283,7 +292,7 @@ function App() {
 
             <div className="field">
               <label htmlFor="winnersOutput">
-                Winners Output 
+                Winners
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
@@ -300,9 +309,10 @@ function App() {
               />
             </div>
 
-            <div className="field">
+            {/* De-prioritized sections */}
+            <div className="field deprioritized">
               <label htmlFor="originalOutput">
-                Original Data for Winners 
+                Original Messages 
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
@@ -319,10 +329,9 @@ function App() {
               />
             </div>
 
-            {/* New output showing each winner's name & difference to target */}
-            <div className="field">
+            <div className="field deprioritized">
               <label htmlFor="differencesOutput">
-                Name &amp; Difference from Winning Number
+                Name(s) &amp; Difference
               </label>
               <textarea
                 id="differencesOutput"
