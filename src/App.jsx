@@ -64,7 +64,7 @@ function App() {
           if (duplicateMode === "last") {
             seen[entry.name] = entry;
           }
-          // In "first" mode, do nothing; we already stored the earliest entry.
+          // In "first" mode, we keep the earlier entry.
         }
       }
     }
@@ -128,145 +128,128 @@ function App() {
     .map(winner => `:W: ${winner.name || "No Name"} - ${winner.number} :W:`)
     .join("\n");
 
-  // Format original data for each winner
-  const originalDataText = winners
-    .map(winner => winner.original)
-    .join("\n");
-
   return (
     <div className="App">
       <h1>Closest Number Picker</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="rawData">Raw Data:</label>
-          <br />
-          <textarea
-            id="rawData"
-            rows="10"
-            cols="50"
-            value={rawData}
-            onChange={(e) => setRawData(e.target.value)}
-            placeholder="Paste your raw data here..."
-          />
-        </div>
-        <div>
-          <label htmlFor="winningNumber">Winning Number:</label>
-          <br />
-          <input
-            id="winningNumber"
-            type="text"
-            value={winningNumber}
-            onChange={(e) => setWinningNumber(e.target.value)}
-            placeholder="Enter winning number"
-          />
-        </div>
-        <div>
-          <label htmlFor="numberOfWinners">Number of Winners:</label>
-          <br />
-          <input
-            id="numberOfWinners"
-            type="number"
-            value={numberOfWinners}
-            onChange={(e) => setNumberOfWinners(e.target.value)}
-            placeholder="Enter number of winners"
-            min="1"
-          />
+      <form onSubmit={handleSubmit} className="form-container">
+        {/* Left Column */}
+        <div className="left-column">
+          <div className="form-group">
+            <label htmlFor="winningNumber">Winning Number:</label>
+            <input
+              id="winningNumber"
+              type="text"
+              value={winningNumber}
+              onChange={(e) => setWinningNumber(e.target.value)}
+              placeholder="Enter winning number"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="numberOfWinners">Number of Winners:</label>
+            <input
+              id="numberOfWinners"
+              type="number"
+              value={numberOfWinners}
+              onChange={(e) => setNumberOfWinners(e.target.value)}
+              placeholder="Enter number of winners"
+              min="1"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="winnersOutput">Winners Output:</label>
+            <textarea
+              id="winnersOutput"
+              readOnly
+              rows="8"
+              value={winnersText}
+              placeholder="Winners will appear here..."
+            />
+          </div>
+          <div className="form-group buttons">
+            <button type="submit">Pick Winners</button>
+            <button type="button" onClick={handleReset}>Reset</button>
+          </div>
         </div>
 
-        {/* Tie Mode Options */}
-        <div className="tie-mode">
-          <p><strong>Tie Handling (if entries are equally close):</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="tieMode"
-              value="first"
-              checked={tieMode === "first"}
-              onChange={(e) => setTieMode(e.target.value)}
+        {/* Right Column */}
+        <div className="right-column">
+          <div className="form-group">
+            <label htmlFor="rawData">Raw Data:</label>
+            <textarea
+              id="rawData"
+              rows="10"
+              value={rawData}
+              onChange={(e) => setRawData(e.target.value)}
+              placeholder="Paste your raw data here..."
             />
-            First Instance Only
-          </label>
-          <br />
-          <label>
+          </div>
+          <div className="form-group whitelist">
+            <label htmlFor="whitelist">
+              Whitelist (comma-separated names - all entries for these names are counted):
+            </label>
             <input
-              type="radio"
-              name="tieMode"
-              value="all"
-              checked={tieMode === "all"}
-              onChange={(e) => setTieMode(e.target.value)}
+              id="whitelist"
+              type="text"
+              value={whitelist}
+              onChange={(e) => setWhitelist(e.target.value)}
+              placeholder="e.g., John, Jane, Bob"
             />
-            All Instances
-          </label>
+          </div>
+          <div className="form-group tie-mode">
+            <p><strong>Tie Handling (if entries are equally close):</strong></p>
+            <label>
+              <input
+                type="radio"
+                name="tieMode"
+                value="first"
+                checked={tieMode === "first"}
+                onChange={(e) => setTieMode(e.target.value)}
+              />
+              First Instance Only
+            </label>
+            <br />
+            <label>
+              <input
+                type="radio"
+                name="tieMode"
+                value="all"
+                checked={tieMode === "all"}
+                onChange={(e) => setTieMode(e.target.value)}
+              />
+              All Instances
+            </label>
+          </div>
+          <div className="form-group duplicate-mode">
+            <p><strong>Duplicate Handling (if same name appears multiple times):</strong></p>
+            <label>
+              <input
+                type="radio"
+                name="duplicateMode"
+                value="first"
+                checked={duplicateMode === "first"}
+                onChange={(e) => setDuplicateMode(e.target.value)}
+              />
+              Keep First Answer
+            </label>
+            <br />
+            <label>
+              <input
+                type="radio"
+                name="duplicateMode"
+                value="last"
+                checked={duplicateMode === "last"}
+                onChange={(e) => setDuplicateMode(e.target.value)}
+              />
+              Keep Last Answer
+            </label>
+          </div>
         </div>
-
-        {/* Duplicate Handling Options */}
-        <div className="duplicate-mode">
-          <p><strong>Duplicate Handling (if same name appears multiple times):</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="duplicateMode"
-              value="first"
-              checked={duplicateMode === "first"}
-              onChange={(e) => setDuplicateMode(e.target.value)}
-            />
-            Keep First Answer
-          </label>
-          <br />
-          <label>
-            <input
-              type="radio"
-              name="duplicateMode"
-              value="last"
-              checked={duplicateMode === "last"}
-              onChange={(e) => setDuplicateMode(e.target.value)}
-            />
-            Keep Last Answer
-          </label>
-        </div>
-
-        {/* Whitelist Input */}
-        <div className="whitelist">
-          <label htmlFor="whitelist">
-            Whitelist (comma-separated names - all entries for these names are counted):
-          </label>
-          <br />
-          <input
-            id="whitelist"
-            type="text"
-            value={whitelist}
-            onChange={(e) => setWhitelist(e.target.value)}
-            placeholder="e.g., John, Jane, Bob"
-          />
-        </div>
-
-        <button type="submit">Pick Winners</button>
-        <button type="button" onClick={handleReset} style={{ marginLeft: "10px" }}>
-          Reset
-        </button>
       </form>
 
-      {winners.length > 0 && (
+      {/* Timestamp and (optional) extra winners section */}
+      {timestamp && (
         <div className="results">
-          <h2>Winners Generated</h2>
           <p><strong>Timestamp:</strong> {timestamp}</p>
-          <label htmlFor="winnersOutput">Winners Output:</label>
-          <textarea
-            id="winnersOutput"
-            readOnly
-            rows="5"
-            cols="50"
-            value={winnersText}
-          />
-          <br />
-          <label htmlFor="originalOutput">Original Data for Each Winner:</label>
-          <textarea
-            id="originalOutput"
-            readOnly
-            rows="5"
-            cols="50"
-            value={originalDataText}
-          />
         </div>
       )}
     </div>
