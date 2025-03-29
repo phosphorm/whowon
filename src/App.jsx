@@ -61,7 +61,7 @@ function App() {
           if (duplicateMode === "last") {
             seen[entry.name] = entry; // keep the later entry
           }
-          // if mode is "first", we do nothing (keep the first occurrence)
+          // if mode is "first", do nothing
         }
       }
     }
@@ -113,7 +113,7 @@ function App() {
     setTimestamp("");
   };
 
-  // Prepare output strings
+  // Output strings
   const winnersText = winners
     .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
     .join("\n");
@@ -127,16 +127,10 @@ function App() {
 
   return (
     <div className="app">
-      {/* Our background container with shapes (positioned behind using z-index: -1) */}
-      <div className="background-shapes">
-        <div className="shape shape1"></div>
-        <div className="shape shape2"></div>
-        <div className="shape shape3"></div>
-      </div>
-
-      {/* Header (non-sticky, scrolls away) */}
+      {/* Header (non-sticky) */}
       <header className="header">
-        <div className="header-left">Closest Number Picker</div>
+        {/* Changed heading to "who won?" */}
+        <div className="header-left">who won?</div>
         <div className="header-right">
           {/* Could add links or other content here */}
         </div>
