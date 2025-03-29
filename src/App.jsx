@@ -1,268 +1,291 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
 
 function App() {
-  // State hooks for form inputs and modes
-  const [rawData, setRawData] = useState('');
-  const [winningNumber, setWinningNumber] = useState('');
-  const [numberOfWinners, setNumberOfWinners] = useState('');
-  const [tieMode, setTieMode] = useState('first'); // "first" or "all"
-  const [duplicateMode, setDuplicateMode] = useState('first'); // "first" or "last"
-  const [whitelist, setWhitelist] = useState('');
-  const [advancedMode, setAdvancedMode] = useState(false); // Toggle for advanced features
+  // State for inputs, options, and results
+  const [rawInput, setRawInput] = useState("");
+  const [target, setTarget] = useState("");
+  const [numWinners, setNumWinners] = useState(1);
+  const [tieMode, setTieMode] = useState("first");
+  const [dupMode, setDupMode] = useState("first");
+  const [whitelist, setWhitelist] = useState("");
   const [winners, setWinners] = useState([]);
-  const [timestamp, setTimestamp] = useState('');
+  const [message, setMessage] = useState("No winners yet. Enter data and click Calculate.");
+  const [timestamp, setTimestamp] = useState("");
 
-  // Parse raw data input into structured entries
-  const parseRawData = (data) => {
-    return data
-      .split('\n')
-      .map((line, index) => ({ line: line.trim(), index }))
-      .filter(item => item.line.length > 0)
-      .map(({ line, index }) => {
-        // Find the first number in the line (supports comma or dot as decimal)
-        const match = line.match(/([-+]?[0-9]*[.,]?[0-9]+)/);
+  // Handle the main calculation logic
+  const handleCalculate = () => {
+    // Parse raw input lines into entries { name, guess, origIndex, original }
+    const lines = rawInput.split("\n").map(line => line.trim()).filter(line => line);
+    if (lines.length === 0) {
+      setWinners([]);
+      setMessage("No entries provided.");
+      return;
+    }
+    const entries = [];
+    lines.forEach((line, idx) => {
+      const parts = line.split(/\s+/);
+      if (parts.length < 2) return;  // skip lines without at least name and number
+      let guess = parseFloat(parts[parts.length - 1]);
+      if (isNaN(guess)) {
+        // If last token isn't a number, attempt to find a trailing number in the line
+        const match = line.match(/[-+]?\d*\.?\d+$/);
         if (match) {
-          const numberValue = parseFloat(match[0].replace(',', '.'));
-          // Remove the number part from the line to isolate the name
-          const name = line.replace(match[0], '').trim();
-          return { name, number: numberValue, original: line, index };
+          guess = parseFloat(match[0]);
+          const namePart = line.slice(0, line.lastIndexOf(match[0]));
+          const name = namePart.replace(/[,:-\s]+$/, "");
+          if (name) {
+            entries.push({ name: name, guess: guess, origIndex: idx, original: line });
+          }
         }
-        return null;
-      })
-      .filter(item => item !== null);
-  };
+      } else {
+        const name = parts.slice(0, -1).join(" ").replace(/[,:-\s]+$/, "");
+        if (name) {
+          entries.push({ name: name, guess: guess, origIndex: idx, original: line });
+        }
+      }
+    });
+    if (entries.length === 0) {
+      setWinners([]);
+      setMessage("No valid entries found.");
+      return;
+    }
+    // Validate target number and number of winners
+    const targetNum = parseFloat(target);
+    if (isNaN(targetNum)) {
+      setWinners([]);
+      setMessage("Please enter a valid target number.");
+      return;
+    }
+    let winnersCount = parseInt(numWinners, 10);
+    if (isNaN(winnersCount) || winnersCount < 1) winnersCount = 1;
 
-  // Main form submission handler
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    let entries = parseRawData(rawData);
-    const target = parseFloat(winningNumber);
-    const winnersCount = parseInt(numberOfWinners, 10);
+    // Prepare whitelist set for names to always include
+    const whitelistNames = whitelist.split(/[,\n]+/).map(name => name.trim()).filter(name => name);
+    const whitelistSet = new Set(whitelistNames);
 
-    if (isNaN(target) || isNaN(winnersCount) || winnersCount < 1) {
-      alert("Please enter valid numbers for Winning Number and Number of Winners.");
+    // Apply duplicate handling (filter entries by name)
+    const filteredEntries = [];
+    if (dupMode === "first") {
+      const seenNames = new Set();
+      entries.forEach(entry => {
+        if (whitelistSet.has(entry.name)) {
+          // Always include whitelisted names' entries
+          filteredEntries.push(entry);
+        } else if (!seenNames.has(entry.name)) {
+          seenNames.add(entry.name);
+          filteredEntries.push(entry);
+        }
+        // If name seen again and not whitelisted, skip (keep first instance)
+      });
+    } else {  // dupMode === "last"
+      const latestEntry = {};
+      entries.forEach(entry => {
+        if (whitelistSet.has(entry.name)) {
+          filteredEntries.push(entry);
+        } else {
+          // Keep replacing to end up with the last entry for each name
+          latestEntry[entry.name] = entry;
+        }
+      });
+      // Add all last entries for non-whitelisted names
+      Object.values(latestEntry).forEach(entry => filteredEntries.push(entry));
+    }
+    if (filteredEntries.length === 0) {
+      setWinners([]);
+      setMessage("No entries remaining after applying duplicate filter.");
       return;
     }
 
-    // Process whitelist: split by comma or newline
-    const whitelistArray = whitelist
-      .split(/[,\n]+/)
-      .map(name => name.trim())
-      .filter(name => name !== "");
-
-    // Filter duplicates according to duplicateMode (except whitelisted names)
-    const filteredEntries = [];
-    const seen = {};
-    
-    for (const entry of entries) {
-      if (whitelistArray.includes(entry.name)) {
-        // Keep all entries for whitelisted names
-        filteredEntries.push(entry);
-      } else {
-        if (!(entry.name in seen)) {
-          seen[entry.name] = entry;
-        } else {
-          if (duplicateMode === "last") {
-            // Replace with the latest entry for this name
-            seen[entry.name] = entry;
-          }
-          // If mode is "first", do nothing (keep the first entry already seen)
-        }
-      }
-    }
-
-    // Add all the kept entries from seen (for non-whitelisted unique names)
-    for (const name in seen) {
-      filteredEntries.push(seen[name]);
-    }
-
-    // Sort entries by closeness to the target number
-    const sortedEntries = filteredEntries.sort((a, b) => {
-      const diffA = Math.abs(a.number - target);
-      const diffB = Math.abs(b.number - target);
-      if (diffA === diffB) {
-        return a.index - b.index; // tie-break by original order
-      }
-      return diffA - diffB;
+    // Calculate difference from target for each entry
+    filteredEntries.forEach(entry => {
+      entry.diff = Math.abs(entry.guess - targetNum);
+    });
+    // Sort by smallest diff (ties broken by original input order)
+    filteredEntries.sort((a, b) => {
+      if (a.diff !== b.diff) return a.diff - b.diff;
+      return a.origIndex - b.origIndex;
     });
 
-    // Determine winners based on tie mode
-    let selectedWinners = sortedEntries.slice(0, winnersCount);
-    
-    if (tieMode === "all" && selectedWinners.length > 0) {
-      // Include all entries that tie with the last winner's diff
-      const lastDiff = Math.abs(selectedWinners[selectedWinners.length - 1].number - target);
-      
-      for (let i = winnersCount; i < sortedEntries.length; i++) {
-        const diff = Math.abs(sortedEntries[i].number - target);
-        if (diff === lastDiff) {
-          selectedWinners.push(sortedEntries[i]);
+    // Select the top N winners
+    let selected = filteredEntries.slice(0, winnersCount);
+    // Tie handling: include all tied entries if mode is "all"
+    if (selected.length > 0 && tieMode === "all") {
+      const cutoffDiff = selected[selected.length - 1].diff;
+      for (let i = winnersCount; i < filteredEntries.length; i++) {
+        if (filteredEntries[i].diff === cutoffDiff) {
+          selected.push(filteredEntries[i]);
         } else {
           break;
         }
       }
     }
 
-    setWinners(selectedWinners);
+    // Update state with results and timestamp
+    setWinners(selected);
+    setMessage(selected.length > 0 ? "" : "No winners found.");
     setTimestamp(new Date().toLocaleString());
   };
 
-  // Reset handler to clear all fields and state
+  // Reset all fields and outputs
   const handleReset = () => {
-    setRawData('');
-    setWinningNumber('');
-    setNumberOfWinners('');
-    setTieMode('first');
-    setDuplicateMode('first');
-    setWhitelist('');
-    setAdvancedMode(false);
+    setRawInput("");
+    setTarget("");
+    setNumWinners(1);
+    setTieMode("first");
+    setDupMode("first");
+    setWhitelist("");
     setWinners([]);
-    setTimestamp('');
+    setMessage("No winners yet. Enter data and click Calculate.");
+    setTimestamp("");
   };
-
-  // Prepare text outputs for winners and original data (for the textareas)
-  const winnersText = winners
-    .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
-    .join("\n");
-    
-  const originalDataText = winners.map(w => w.original).join("\n");
 
   return (
     <div className="app">
-      <header className="header">
-        <h1 className="app-title">Random Number Picker</h1>
-        <div className="header-right">
-          <div className="logo-placeholder"></div>
-          <button className="reset-btn" onClick={handleReset}>
-            <i className="material-icons">refresh</i> Reset
-          </button>
-        </div>
-      </header>
-
+      <h1>Closest Number Picker</h1>
       <div className="content">
+        {/* Left column: Entries Input */}
         <div className="left">
-          <form onSubmit={handleSubmit}>
-            <div className="field">
-              <label htmlFor="rawData">Enter One Entry Per Line (Name and Number)</label>
-              <textarea 
-                id="rawData" 
-                value={rawData} 
-                onChange={(e) => setRawData(e.target.value)}
-                rows="10" 
-                placeholder="John Doe 42.5&#10;Jane Smith 38.7"
-                required
-              />
-            </div>
+          <div className="field">
+            <label htmlFor="rawInput">
+              Entries Input 
+              <span className="tooltip">ℹ️
+                <span className="tooltiptext">
+                  List of name and number guesses, one per line (e.g. "Alice 42")
+                </span>
+              </span>
+            </label>
+            <textarea 
+              id="rawInput"
+              rows="10"
+              value={rawInput}
+              onChange={e => setRawInput(e.target.value)}
+              placeholder={"e.g.\nAlice 42\nBob 100\nCharlie 77"} />
+          </div>
+        </div>
 
+        {/* Right column: Controls and Results */}
+        <div className="right">
+          {/* Tie & Duplicate handling options are side-by-side in this config box */}
+          <div className="config-box">
             <div className="field">
-              <label htmlFor="winningNumber">Winning Number</label>
+              <label htmlFor="target">
+                Target Number 
+                <span className="tooltip">ℹ️
+                  <span className="tooltiptext">The target number to compare guesses against</span>
+                </span>
+              </label>
               <input 
-                id="winningNumber" 
-                type="text" 
-                value={winningNumber} 
-                onChange={(e) => setWinningNumber(e.target.value)}
-                placeholder="Enter the target number"
-                required
-              />
+                id="target"
+                type="number"
+                value={target}
+                onChange={e => setTarget(e.target.value)}
+                placeholder="Enter target number" />
             </div>
-
             <div className="field">
-              <label htmlFor="numberOfWinners">Number of Winners</label>
+              <label htmlFor="numWinners">
+                Number of Winners 
+                <span className="tooltip">ℹ️
+                  <span className="tooltiptext">
+                    How many winners to pick (tied winners are included if tie handling is "all")
+                  </span>
+                </span>
+              </label>
               <input 
-                id="numberOfWinners" 
-                type="number" 
-                value={numberOfWinners} 
-                onChange={(e) => setNumberOfWinners(e.target.value)}
-                placeholder="How many winners?"
-                min="1"
-                required
-              />
+                id="numWinners"
+                type="number"
+                min="1" 
+                step="1"
+                value={numWinners}
+                onChange={e => setNumWinners(e.target.value)}
+                placeholder="1" />
             </div>
-
-            <div className="advanced-toggle-field">
-              <button 
-                type="button" 
-                className={`advanced-toggle ${advancedMode ? 'on' : 'off'}`}
-                onClick={() => setAdvancedMode(!advancedMode)}
-              >
-                <i className="material-icons">{advancedMode ? 'toggle_on' : 'toggle_off'}</i>
-                Advanced Options
-              </button>
-            </div>
-
-            {/* Put tie and duplicate handling side by side */}
             <div className="inline-fields">
               <div className="field">
-                <label htmlFor="tieMode">Tie Handling</label>
+                <label htmlFor="tieMode">
+                  Tie Handling 
+                  <span className="tooltip">ℹ️
+                    <span className="tooltiptext">
+                      If multiple guesses are equally close, pick only the first one (input order) or include all tied entries
+                    </span>
+                  </span>
+                </label>
                 <select 
-                  id="tieMode" 
-                  value={tieMode} 
-                  onChange={(e) => setTieMode(e.target.value)}
-                  disabled={!advancedMode}>
-                  <option value="first">Choose First {numberOfWinners}</option>
+                  id="tieMode"
+                  value={tieMode}
+                  onChange={e => setTieMode(e.target.value)}>
+                  <option value="first">First Only</option>
                   <option value="all">Include All Ties</option>
                 </select>
               </div>
-              
               <div className="field">
-                <label htmlFor="duplicateMode">Duplicate Handling</label>
+                <label htmlFor="dupMode">
+                  Duplicate Handling 
+                  <span className="tooltip">ℹ️
+                    <span className="tooltiptext">
+                      If a name has multiple entries, keep either their first entry or their last entry
+                    </span>
+                  </span>
+                </label>
                 <select 
-                  id="duplicateMode" 
-                  value={duplicateMode} 
-                  onChange={(e) => setDuplicateMode(e.target.value)}
-                  disabled={!advancedMode}>
+                  id="dupMode"
+                  value={dupMode}
+                  onChange={e => setDupMode(e.target.value)}>
                   <option value="first">Keep First Entry</option>
                   <option value="last">Keep Last Entry</option>
                 </select>
               </div>
             </div>
-
-            <div className={`field ${!advancedMode ? 'disabled-field' : ''}`}>
-              <label htmlFor="whitelist">Whitelist (allow duplicates for these names)</label>
+            <div className="field">
+              <label htmlFor="whitelist">
+                Whitelist Names 
+                <span className="tooltip">ℹ️
+                  <span className="tooltiptext">
+                    Names (comma or newline separated) whose entries should always be kept (no duplicate removal)
+                  </span>
+                </span>
+              </label>
               <textarea 
-                id="whitelist" 
-                value={whitelist} 
-                onChange={(e) => setWhitelist(e.target.value)}
-                rows="3"
-                placeholder="Enter names to whitelist (comma or line separated)"
-                disabled={!advancedMode}
-              />
+                id="whitelist"
+                rows="2"
+                value={whitelist}
+                onChange={e => setWhitelist(e.target.value)}
+                placeholder="e.g. Alice, Bob" />
             </div>
+            <button className="calculate-btn" onClick={handleCalculate}>Calculate Winners</button>
+            <button className="reset-btn" type="button" onClick={handleReset}>Reset</button>
+          </div>
 
-            <button type="submit" className="pick-winners-btn">
-              <i className="material-icons">emoji_events</i> Pick Winners
-            </button>
-          </form>
-        </div>
-
-        <div className="right">
-          {/* Always show the results section */}
-          <div className="results">
-            <div className="output-section">
-              <h2>Winners</h2>
-              <textarea 
-                className="output-textarea"
-                readOnly
-                value={winnersText}
-                rows={Math.max(5, winners.length + 1)}
-                placeholder="Winners will appear here"
-              />
-            </div>
-            
-            <div className="output-section">
-              <h2>Original Entries</h2>
-              <textarea 
-                className="output-textarea"
-                readOnly
-                value={originalDataText}
-                rows={Math.max(5, winners.length + 1)}
-                placeholder="Original entries will appear here"
-              />
-            </div>
-            
-            <div className="timestamp-wrapper">
-              {timestamp && <span className="timestamp">{timestamp}</span>}
+          <div className="output-box">
+            <h2>Winners</h2>
+            {winners.length > 0 ? (
+              <ul>
+                {winners.map((entry, index) => {
+                  // Display diff with at most 2 decimal places if not integer
+                  const diffDisplay = Number.isInteger(entry.diff) ? entry.diff : entry.diff.toFixed(2);
+                  return (
+                    <li key={index}>
+                      {entry.name} – {entry.guess}
+                      {entry.diff !== undefined && ` (Diff: ${diffDisplay})`}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="no-winners">{message}</p>
+            )}
+            {winners.length > 0 && (
+              <>
+                <h2>Original Data</h2>
+                <ul>
+                  {winners.map((entry, idx) => (
+                    <li key={idx}>{entry.original}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <div className="timestamp">
+              {timestamp && `Timestamp: ${timestamp}`}
             </div>
           </div>
         </div>
