@@ -51,21 +51,17 @@ function App() {
     clearErrors();
 
     let hasError = false;
-
-    // Validate rawData if desired
+    // Validate rawData
     if (!rawData.trim()) {
-      // Not strictly required to have raw data if user wants an empty set, but let's warn them
-      setRawDataError("No data provided. Make sure you have at least one name/number entry!");
+      setRawDataError("No data provided. Please enter at least one name/number pair.");
       hasError = true;
     }
-
     // Validate winning number
     const target = parseFloat(winningNumber);
     if (isNaN(target)) {
       setWinningNumberError("Please provide a valid numeric Winning Number.");
       hasError = true;
     }
-
     // If exactMatch is off, we need a valid numberOfWinners
     if (!exactMatch) {
       const wCount = parseInt(numberOfWinners, 10);
@@ -75,15 +71,12 @@ function App() {
       }
     }
 
-    if (hasError) {
-      // If any field is invalid, don't proceed
-      return;
-    }
+    if (hasError) return; // don't proceed if any field is invalid
 
     // Parse data
     const entries = parseRawData(rawData);
 
-    // Prepare whitelist array
+    // Whitelist array
     const whitelistArray = whitelist
       .split(",")
       .map(name => name.trim())
@@ -112,7 +105,7 @@ function App() {
     let selectedWinners = [];
 
     if (exactMatch) {
-      // Pick only entries whose number == target
+      // Only entries whose number == target
       selectedWinners = filteredEntries.filter(e => e.number === target);
     } else {
       // Sort by closeness
@@ -164,7 +157,6 @@ function App() {
 
   // Preset "Promo"
   const handlePromoPreset = () => {
-    // Does not reset rawData
     setNumberOfWinners("2");
     setDuplicateMode("first");
     setTieMode("first");
@@ -184,7 +176,6 @@ function App() {
     .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
     .join("\n");
   const originalDataText = winners.map(w => w.original).join("\n");
-  // Round difference to 2 decimals
   const differencesText = winners
     .map(w => {
       const diff = Math.abs(w.number - parseFloat(winningNumber)).toFixed(2);
@@ -200,13 +191,12 @@ function App() {
     setExactMatch(!exactMatch);
   };
 
-  // If exactMatch is on, tie & duplicate settings are disabled & visually grayed out
+  // If exactMatch is on, tie & duplicate are disabled & visually grayed out
   const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
-  // Similarly, if exactMatch is on, numberOfWinners is disabled but let's also style it with .disabled-section
-  const numberOfWinnersClasses = exactMatch ? "disabled-section" : "";
 
   return (
     <div className="app">
+      {/* Header */}
       <header className="header">
         <div className="header-left">who won?</div>
         <div className="header-right"></div>
@@ -265,21 +255,39 @@ function App() {
               {winningNumberError && <div className="field-error">{winningNumberError}</div>}
             </div>
 
-            {/* Number of Winners + iOS toggle */}
-            <div className={`field ${numberOfWinnersClasses}`}>
-              <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
-                <div>
-                  Number of Winners
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      How many winners to pick (unless Exact Match is on).
+            {/* Number of Winners & Exact Match Toggle in same row, but separate containers */}
+            <div className="field" style={{ display: "flex", gap: "1rem" }}>
+              {/* Number of Winners container -> can be grayed out if exactMatch is on */}
+              <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
+                <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
+                  <div>
+                    Number of Winners
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        How many winners to pick (unless Exact Match is on).
+                      </span>
                     </span>
-                  </span>
-                </div>
-                {/* iOS-like toggle for Exact Match, with label text on left and info icon on right */}
-                <div className="ios-toggle-container" style={{ marginLeft: "auto" }}>
+                  </div>
+                </label>
+                <input
+                  id="numberOfWinners"
+                  type="number"
+                  value={numberOfWinners}
+                  onChange={(e) => setNumberOfWinners(e.target.value)}
+                  placeholder="Enter number of winners"
+                  min="1"
+                  disabled={exactMatch}
+                />
+                {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
+              </div>
+
+              {/* The toggle remains active even if exactMatch is on */}
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                <label style={{ marginBottom: "0.3em" }}>
                   <span>Exact Match</span>
+                </label>
+                <div className="ios-toggle-container">
                   <div
                     className={`ios-toggle ${exactMatch ? "checked" : ""}`}
                     onClick={toggleExactMatch}
@@ -291,17 +299,7 @@ function App() {
                     </span>
                   </span>
                 </div>
-              </label>
-              <input
-                id="numberOfWinners"
-                type="number"
-                value={numberOfWinners}
-                onChange={(e) => setNumberOfWinners(e.target.value)}
-                placeholder="Enter number of winners"
-                min="1"
-                disabled={exactMatch}
-              />
-              {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
+              </div>
             </div>
 
             {/* Tie mode & duplicate mode side by side */}
@@ -385,13 +383,13 @@ function App() {
         <div className="right" style={{ flexDirection: "column" }}>
           {/* Presets Panel */}
           <div className="panel">
-            <h2 style={{ marginTop: 0, marginBottom: "1rem" }}>
+            <h2 style={{ marginTop: 0, marginBottom: "0.8rem" }}>
               <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
                 widgets
               </span>
               Presets
             </h2>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
               {/* "Promo" & "Classic" on the left */}
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button className="secondary-btn" onClick={handlePromoPreset}>
@@ -404,7 +402,7 @@ function App() {
                 </button>
               </div>
 
-              {/* Reset icon on the right */}
+              {/* Reset icon on the right (muted red) */}
               <div style={{ marginLeft: "auto" }}>
                 <button className="reset-button" onClick={handleReset}>
                   <span className="material-icons">refresh</span>
@@ -441,7 +439,7 @@ function App() {
                 </label>
                 <textarea
                   id="originalOutput"
-                  rows="5"
+                  rows="4"
                   readOnly
                   value={originalDataText}
                   placeholder="Original entries of winners will appear here..."
@@ -460,7 +458,7 @@ function App() {
                 </label>
                 <textarea
                   id="differencesOutput"
-                  rows="5"
+                  rows="4"
                   readOnly
                   value={differencesText}
                   placeholder="No differences to display yet..."
@@ -479,7 +477,7 @@ function App() {
                 </label>
                 <textarea
                   id="winnersOutput"
-                  rows="5"
+                  rows="4"
                   readOnly
                   value={winnersText}
                   placeholder="No winners to display yet..."

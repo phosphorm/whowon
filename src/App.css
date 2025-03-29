@@ -12,11 +12,11 @@ html, body {
   min-height: 100vh;
 }
 
-/* Main container: up to 900px wide, centered horizontally, with padding */
+/* Main container: up to 900px wide, centered horizontally, with less overall padding. */
 .app {
   max-width: 900px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem;  /* reduced from 1rem */
   position: relative;
   z-index: 0;
 }
@@ -33,14 +33,9 @@ html, body {
   background: radial-gradient(circle at 50% 50%, rgba(0,255,0,0.07), transparent 70%);
   animation: subtleBg 10s ease-in-out infinite alternate;
 }
-
 @keyframes subtleBg {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.02);
-  }
+  0% { transform: scale(1); }
+  100% { transform: scale(1.02); }
 }
 
 /* Header: within .app, so it won't exceed columns */
@@ -50,9 +45,9 @@ html, body {
   justify-content: space-between;
   align-items: center;
   background: #0f0f0f;
-  padding: 0.8rem 1rem;
+  padding: 0.5rem 1rem;  /* reduced vertical padding */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;  /* reduced spacing below header */
 }
 .header .header-left {
   font-size: 1.2rem;
@@ -73,13 +68,13 @@ html, body {
   color: #fff;
 }
 
-/* Main content: two columns, stretch to match height */
+/* Main content: two columns, less vertical spacing. */
 .content {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 1rem; /* reduced gap from 2rem */
   align-items: stretch;
-  padding-bottom: 2rem;
+  padding-bottom: 1rem; /* less bottom padding */
 }
 .left, .right {
   flex: 1 1 0;
@@ -91,16 +86,16 @@ html, body {
   flex: 2 1 0; /* left panel is a bit wider */
 }
 
-/* Panels fill their column's height */
+/* Panels with smaller top/bottom padding, less margin-bottom. */
 .panel {
   background: #1a1a1a;
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1rem;  /* reduced from 1.5rem */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 2rem; /* spacing between stacked panels in right column */
+  margin-bottom: 1rem;  /* reduced from 2rem */
 }
 
 /* Headings */
@@ -119,7 +114,7 @@ h2 {
 
 /* Form field group */
 .field {
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.8rem;  /* reduced from 1.2rem */
 }
 .field label {
   display: flex;
@@ -137,7 +132,7 @@ h2 {
 
 /* Inline error text styling */
 .field-error {
-  color: #ff5555;  /* bright red for error message text */
+  color: #ff5555;
   font-size: 0.85em;
   margin-top: 0.2rem;
   font-style: italic;
@@ -178,7 +173,7 @@ input, textarea, select {
   border: none;
   color: #f0f0f0;
   border-radius: 6px;
-  padding: 0.5em 0.8em;
+  padding: 0.4em 0.6em; /* reduced padding */
   font-size: 1em;
   box-sizing: border-box;
   transition: box-shadow 0.3s, background-color 0.3s;
@@ -201,7 +196,7 @@ button {
   font-weight: 600;
   border: none;
   border-radius: 6px;
-  padding: 0.5em 0.8em;
+  padding: 0.4em 0.6em; /* reduced padding */
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
   display: inline-flex;
@@ -224,9 +219,9 @@ button {
 .reset-button {
   width: 2rem;
   height: 2rem;
-  justify-content: center; /* center the icon horizontally */
+  justify-content: center;
   border-radius: 6px;
-  background-color: #AA4444; /* muted red */
+  background-color: #AA4444;
   color: #ffffff;
 }
 .reset-button:hover {
@@ -281,9 +276,9 @@ button {
 .winners-field {
   border: 2px solid #00ff00;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.8rem; /* reduced from 1rem */
   box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 .winners-field label {
   font-size: 1.05em;
