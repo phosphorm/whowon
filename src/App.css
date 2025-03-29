@@ -21,3 +21,22 @@ button {
   font-size: 1rem;
   cursor: pointer;
 }
+
+.tie-mode {
+  margin-bottom: 15px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.results {
+  margin-top: 20px;
+  background-color: #f8f8f8;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.results textarea {
+  margin-top: 5px;
+  resize: vertical;
+}
