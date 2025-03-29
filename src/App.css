@@ -8,11 +8,23 @@ html, body {
   background-color: #0d0d0d; /* nearly black background */
   color: #f0f0f0;
   font-family: 'Inter', sans-serif;
-  /* Ensure page height can accommodate the background shapes */
   min-height: 100vh;
 }
 
-/* A container for the animated shapes */
+/* 
+  The app container is now restored to a centered layout.
+  Ensures the main content is max 900px wide, centered horizontally,
+  and has consistent padding around it.
+*/
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  position: relative;
+  z-index: 0; /* so it's above the background-shapes */
+}
+
+/* Fixed-position container for the animated shapes, behind everything */
 .background-shapes {
   position: fixed;
   top: 0;
@@ -20,28 +32,24 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  z-index: -1; /* behind everything */
+  z-index: -1; /* behind the .app content */
 }
 
-/* Common shape styling (green glow circles) */
+/* Common shape styling */
 .shape {
   position: absolute;
   border-radius: 50%;
-  /* Subtle radial glow using the same green color but transparent in the center out */
   background: radial-gradient(circle, rgba(0,255,0,0.15) 0%, rgba(0,255,0,0) 70%);
   animation: float 12s ease-in-out infinite alternate;
 }
 
-/* We can define multiple shapes with different sizes and positions */
-
-/* Large shape in top-left */
+/* Individual shapes */
 .shape1 {
   top: -100px;
   left: -100px;
   width: 300px;
   height: 300px;
 }
-/* Medium shape moving across the middle */
 .shape2 {
   top: 40%;
   left: 10%;
@@ -49,7 +57,6 @@ html, body {
   height: 200px;
   animation-duration: 10s;
 }
-/* Another shape floating near bottom-right */
 .shape3 {
   bottom: -120px;
   right: -120px;
@@ -58,32 +65,27 @@ html, body {
   animation-duration: 14s;
 }
 
-/* Keyframes to float shapes around horizontally */
+/* Keyframes to float shapes around */
 @keyframes float {
-  0% {
-    transform: translateX(0) translateY(0);
-  }
-  50% {
-    transform: translateX(30px) translateY(-20px) scale(1.05);
-  }
-  100% {
-    transform: translateX(-40px) translateY(20px) scale(0.95);
-  }
+  0%   { transform: translateX(0)   translateY(0); }
+  50%  { transform: translateX(30px) translateY(-20px) scale(1.05); }
+  100% { transform: translateX(-40px) translateY(20px) scale(0.95); }
 }
 
-/* Header (now non-sticky, so it scrolls with content) */
+/* 
+  Header (non-sticky, so it scrolls off the page).
+  It's now inside .app, so the site is still centered.
+*/
 .header {
-  /* Removed position: sticky; top: 0; so header won't pin */
+  width: 100%;
   background: #0f0f0f;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  width: 100%;
 }
 
-/* Header text styles */
 .header .header-left {
   font-size: 1.2rem;
   font-weight: 600;
@@ -102,7 +104,7 @@ html, body {
   color: #fff;
 }
 
-/* Main content layout: two columns on large, one column on small */
+/* Main content layout: two columns on large, single on small */
 .content {
   display: flex;
   flex-wrap: wrap;
@@ -116,12 +118,12 @@ html, body {
   min-width: 280px;
 }
 .left {
-  flex: 2 1 0; /* Left panel is a bit wider */
+  flex: 2 1 0; /* left panel a bit wider */
 }
 
 /* Panels for input and output sections */
 .panel {
-  background: #1a1a1a;  /* slightly lighter dark for contrast */
+  background: #1a1a1a;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
@@ -138,7 +140,7 @@ h1 {
 h2 {
   font-size: 1.2em;
   font-weight: 600;
-  margin-top: 0; /* If inside panel, align to top of panel */
+  margin-top: 0;
 }
 
 /* Form field group */

@@ -61,11 +61,11 @@ function App() {
           if (duplicateMode === "last") {
             seen[entry.name] = entry; // keep the later entry
           }
-          // if mode is "first", do nothing
+          // if mode is "first", we do nothing (keep the first occurrence)
         }
       }
     }
-    // Add back non-whitelisted unique
+    // Add back unique non-whitelisted
     for (const name in seen) {
       filteredEntries.push(seen[name]);
     }
@@ -127,7 +127,7 @@ function App() {
 
   return (
     <div className="app">
-      {/* Our new background container with shapes */}
+      {/* Our background container with shapes (positioned behind using z-index: -1) */}
       <div className="background-shapes">
         <div className="shape shape1"></div>
         <div className="shape shape2"></div>
@@ -268,7 +268,6 @@ function App() {
               />
             </div>
 
-            {/* Buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
               <button type="submit" className="primary-btn">Pick Winners</button>
               <button type="button" className="secondary-btn" onClick={handleReset}>Reset</button>
