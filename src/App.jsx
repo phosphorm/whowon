@@ -2,20 +2,23 @@ import React, { useState } from "react";
 import "./App.css";
 
 function App() {
+  // Fields
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
-
-  // Tie and duplicate modes
   const [tieMode, setTieMode] = useState("all");       // "all" or "first"
   const [duplicateMode, setDuplicateMode] = useState("first"); // "first" or "last"
-
-  // Additional toggle for exact match
   const [exactMatch, setExactMatch] = useState(false);
-
   const [whitelist, setWhitelist] = useState("");
+
+  // Winners
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
+
+  // Inline error states
+  const [rawDataError, setRawDataError] = useState("");
+  const [winningNumberError, setWinningNumberError] = useState("");
+  const [numberOfWinnersError, setNumberOfWinnersError] = useState("");
 
   // Parse raw data lines
   const parseRawData = (data) => {
@@ -35,16 +38,50 @@ function App() {
       .filter(item => item !== null);
   };
 
+  // Clear all error messages
+  const clearErrors = () => {
+    setRawDataError("");
+    setWinningNumberError("");
+    setNumberOfWinnersError("");
+  };
+
   // "Pick Winners"
   const handleSubmit = (e) => {
     e.preventDefault();
-    const entries = parseRawData(rawData);
-    const target = parseFloat(winningNumber);
+    clearErrors();
 
-    if (isNaN(target) || (!exactMatch && (isNaN(parseInt(numberOfWinners, 10)) || parseInt(numberOfWinners, 10) < 1))) {
-      alert("Please enter valid numbers for Winning Number and Number of Winners.");
+    let hasError = false;
+
+    // Validate rawData if desired
+    if (!rawData.trim()) {
+      // Not strictly required to have raw data if user wants an empty set, but let's warn them
+      setRawDataError("No data provided. Make sure you have at least one name/number entry!");
+      hasError = true;
+    }
+
+    // Validate winning number
+    const target = parseFloat(winningNumber);
+    if (isNaN(target)) {
+      setWinningNumberError("Please provide a valid numeric Winning Number.");
+      hasError = true;
+    }
+
+    // If exactMatch is off, we need a valid numberOfWinners
+    if (!exactMatch) {
+      const wCount = parseInt(numberOfWinners, 10);
+      if (isNaN(wCount) || wCount < 1) {
+        setNumberOfWinnersError("Please provide a valid Number of Winners (>=1).");
+        hasError = true;
+      }
+    }
+
+    if (hasError) {
+      // If any field is invalid, don't proceed
       return;
     }
+
+    // Parse data
+    const entries = parseRawData(rawData);
 
     // Prepare whitelist array
     const whitelistArray = whitelist
@@ -88,15 +125,15 @@ function App() {
         return diffA - diffB;
       });
 
-      const winnersCount = parseInt(numberOfWinners, 10);
+      const wCount = parseInt(numberOfWinners, 10);
       if (tieMode === "first") {
-        selectedWinners = sortedEntries.slice(0, winnersCount);
+        selectedWinners = sortedEntries.slice(0, wCount);
       } else {
         // "all" -> include ties after top N
-        selectedWinners = sortedEntries.slice(0, winnersCount);
+        selectedWinners = sortedEntries.slice(0, wCount);
         if (selectedWinners.length > 0) {
           const thresholdDiff = Math.abs(selectedWinners[selectedWinners.length - 1].number - target);
-          for (let i = winnersCount; i < sortedEntries.length; i++) {
+          for (let i = wCount; i < sortedEntries.length; i++) {
             if (Math.abs(sortedEntries[i].number - target) === thresholdDiff) {
               selectedWinners.push(sortedEntries[i]);
             } else {
@@ -122,6 +159,7 @@ function App() {
     setExactMatch(false);
     setWinners([]);
     setTimestamp("");
+    clearErrors();
   };
 
   // Preset "Promo"
@@ -164,10 +202,11 @@ function App() {
 
   // If exactMatch is on, tie & duplicate settings are disabled & visually grayed out
   const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
+  // Similarly, if exactMatch is on, numberOfWinners is disabled but let's also style it with .disabled-section
+  const numberOfWinnersClasses = exactMatch ? "disabled-section" : "";
 
   return (
     <div className="app">
-      {/* Header (no icon before 'who won?') */}
       <header className="header">
         <div className="header-left">who won?</div>
         <div className="header-right"></div>
@@ -184,6 +223,7 @@ function App() {
           </h1>
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            {/* Raw Data */}
             <div className="field">
               <label htmlFor="rawData">
                 Raw Data
@@ -201,8 +241,10 @@ function App() {
                 onChange={(e) => setRawData(e.target.value)}
                 placeholder="Paste your raw data here (one name and number per line)..."
               />
+              {rawDataError && <div className="field-error">{rawDataError}</div>}
             </div>
 
+            {/* Winning Number */}
             <div className="field">
               <label htmlFor="winningNumber">
                 Winning Number
@@ -220,10 +262,11 @@ function App() {
                 onChange={(e) => setWinningNumber(e.target.value)}
                 placeholder="Enter the winning number"
               />
+              {winningNumberError && <div className="field-error">{winningNumberError}</div>}
             </div>
 
             {/* Number of Winners + iOS toggle */}
-            <div className="field">
+            <div className={`field ${numberOfWinnersClasses}`}>
               <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
                 <div>
                   Number of Winners
@@ -258,9 +301,10 @@ function App() {
                 min="1"
                 disabled={exactMatch}
               />
+              {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
             </div>
 
-            {/* Tie mode & duplicate mode side by side, wrapped in tieDuplicateClasses */}
+            {/* Tie mode & duplicate mode side by side */}
             <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
               <div className="field" style={{ flex: 1 }}>
                 <label htmlFor="tieMode">
@@ -305,6 +349,7 @@ function App() {
               </div>
             </div>
 
+            {/* Whitelist */}
             <div className="field">
               <label htmlFor="whitelist">
                 Whitelist Names
@@ -336,20 +381,17 @@ function App() {
           </form>
         </div>
 
-        {/* Right Column: Two stacked panels:
-            1) Presets/Reset
-            2) Results
-        */}
+        {/* Right Column: Two stacked panels: Presets & Results */}
         <div className="right" style={{ flexDirection: "column" }}>
           {/* Presets Panel */}
           <div className="panel">
-            <h2 style={{ marginTop: 0 }}>
+            <h2 style={{ marginTop: 0, marginBottom: "1rem" }}>
               <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
                 widgets
               </span>
               Presets
             </h2>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.5rem" }}>
               {/* "Promo" & "Classic" on the left */}
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button className="secondary-btn" onClick={handlePromoPreset}>
@@ -364,7 +406,7 @@ function App() {
 
               {/* Reset icon on the right */}
               <div style={{ marginLeft: "auto" }}>
-                <button className="secondary-btn reset-button" onClick={handleReset}>
+                <button className="reset-button" onClick={handleReset}>
                   <span className="material-icons">refresh</span>
                 </button>
               </div>

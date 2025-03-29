@@ -99,8 +99,8 @@ html, body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  flex: 1; 
-  margin-bottom: 2rem; /* slight spacing between stacked panels in right column */
+  flex: 1;
+  margin-bottom: 2rem; /* spacing between stacked panels in right column */
 }
 
 /* Headings */
@@ -133,6 +133,14 @@ h2 {
   font-size: 18px;
   color: #888;
   cursor: help;
+}
+
+/* Inline error text styling */
+.field-error {
+  color: #ff5555;  /* bright red for error message text */
+  font-size: 0.85em;
+  margin-top: 0.2rem;
+  font-style: italic;
 }
 
 /* Tooltip container */
@@ -211,6 +219,24 @@ button {
 .primary-btn:active {
   background-color: #007500;
 }
+
+/* Muted red for reset button */
+.reset-button {
+  width: 2rem;
+  height: 2rem;
+  justify-content: center; /* center the icon horizontally */
+  border-radius: 6px;
+  background-color: #AA4444; /* muted red */
+  color: #ffffff;
+}
+.reset-button:hover {
+  background-color: #bb5555;
+  box-shadow: 0 0 8px rgba(255, 120, 120, 0.2);
+}
+.reset-button:active {
+  background-color: #993333;
+}
+
 .secondary-btn {
   background-color: #444444;
   color: #ffffff;
@@ -226,14 +252,6 @@ button {
 /* The "Pick Winners" button remains full width on the left panel */
 .pick-winners-wide {
   width: 100%;
-}
-
-/* Smaller, square reset button with only icon */
-.reset-button {
-  width: 2rem;
-  height: 2rem;
-  justify-content: center; /* center the icon horizontally */
-  border-radius: 6px;
 }
 
 /* Results / output styling */
