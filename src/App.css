@@ -24,7 +24,7 @@ html, body {
 /* Subtle animated background gradient behind everything */
 .app::before {
   content: "";
-  position: fixed; /* stays fixed in the viewport */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -54,7 +54,6 @@ html, body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
   margin-bottom: 1rem;
 }
-
 .header .header-left {
   font-size: 1.2rem;
   font-weight: 600;
@@ -186,14 +185,14 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.5);
 }
 
-/* Buttons: smaller now */
+/* Buttons: slightly smaller */
 button {
   font-family: 'Inter', sans-serif;
-  font-size: 0.9em; /* slightly smaller font */
+  font-size: 0.9em;
   font-weight: 600;
   border: none;
   border-radius: 6px;
-  padding: 0.5em 0.8em; /* smaller padding */
+  padding: 0.5em 0.8em;
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
   display: inline-flex;
@@ -305,4 +304,34 @@ button {
 }
 .ios-toggle.checked::before {
   transform: translateX(16px);
+}
+
+/* 
+  The new "Presets" block and the "Results" block each get an order on wide screens:
+  - presets-block: order 0 (top)
+  - results-block: order 1
+  On mobile, we flip them so presets is last.
+*/
+.presets-block {
+  order: 0;
+}
+.results-block {
+  order: 1;
+}
+
+/* On mobile, show results block first, presets second. */
+@media (max-width: 600px) {
+  .presets-block {
+    order: 2;
+  }
+  .results-block {
+    order: 1;
+  }
+}
+
+/* Additional styling to show disabled options (tie & duplicate) more obviously
+   grayed out when exact match is on. */
+.disabled-section {
+  opacity: 0.3;
+  pointer-events: none; /* can't be changed while disabled */
 }

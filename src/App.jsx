@@ -162,6 +162,9 @@ function App() {
     setExactMatch(!exactMatch);
   };
 
+  // If exactMatch is on, tie & duplicate settings are disabled & visually grayed out
+  const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
+
   return (
     <div className="app">
       {/* Header (no icon before 'who won?') */}
@@ -231,8 +234,9 @@ function App() {
                     </span>
                   </span>
                 </div>
-                {/* iOS-like toggle for Exact Match, with info icon on right */}
+                {/* iOS-like toggle for Exact Match, with label text on left and info icon on right */}
                 <div className="ios-toggle-container" style={{ marginLeft: "auto" }}>
+                  <span>Exact Match</span>
                   <div
                     className={`ios-toggle ${exactMatch ? "checked" : ""}`}
                     onClick={toggleExactMatch}
@@ -240,8 +244,7 @@ function App() {
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      Enable Exact Match: only pick entries whose number matches exactly. 
-                      Duplicate/Tie settings won’t apply.
+                      Only pick entries whose number matches exactly; tie &amp; duplicate settings won't apply.
                     </span>
                   </span>
                 </div>
@@ -257,8 +260,8 @@ function App() {
               />
             </div>
 
-            {/* Tie mode & duplicate mode side by side */}
-            <div style={{ display: "flex", gap: "1rem" }}>
+            {/* Tie mode & duplicate mode side by side, wrapped in tieDuplicateClasses */}
+            <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
               <div className="field" style={{ flex: 1 }}>
                 <label htmlFor="tieMode">
                   Tie Handling
@@ -334,17 +337,17 @@ function App() {
         </div>
 
         {/* Right Panel */}
-        <div className="right panel">
-          <h1 style={{ marginTop: 0 }}>
+        {/* PRESETS block on top (order:0 on desktop, order:2 on mobile) */}
+        <div className="right panel presets-block">
+          <h2 style={{ marginTop: 0 }}>
             <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-              list_alt
+              widgets
             </span>
-            Results
-          </h1>
+            Presets
+          </h2>
 
-          {/* Preset Buttons and Reset Icon aligned in one row */}
           <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-            {/* "Promo" & "Classic" on left */}
+            {/* "Promo" & "Classic" on the left */}
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <button className="secondary-btn" onClick={handlePromoPreset}>
                 <span className="material-icons">local_offer</span>
@@ -355,6 +358,7 @@ function App() {
                 Classic
               </button>
             </div>
+
             {/* Reset icon on the right */}
             <div style={{ marginLeft: "auto" }}>
               <button className="secondary-btn reset-button" onClick={handleReset}>
@@ -362,6 +366,17 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* RESULTS block (order:1 on desktop, order:1 on mobile - so it's still above the presets on mobile? 
+            Actually user wants it at top on mobile, so we keep it order:1, and presets is order:2. */}
+        <div className="right panel results-block">
+          <h1 style={{ marginTop: 0 }}>
+            <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
+              list_alt
+            </span>
+            Results
+          </h1>
 
           <div className="results">
             {timestamp ? (
