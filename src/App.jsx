@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
 
-/**
- * Transform the name if the 'Message Filter' is on.
- */
 function transformName(originalName) {
   const words = originalName.trim().split(/\s+/);
   if (!words.length) return originalName;
@@ -17,7 +14,6 @@ function transformName(originalName) {
 }
 
 function App() {
-  // Fields
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
@@ -25,27 +21,21 @@ function App() {
   const [duplicateMode, setDuplicateMode] = useState("first");
   const [exactMatch, setExactMatch] = useState(false);
   const [whitelist, setWhitelist] = useState("");
+  const [filterNames, setFilterNames] = useState(true);
 
-  // Toggle for "Message Filter"
-  const [filterNames, setFilterNames] = useState(true); // default on
-
-  // Winners & metadata
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
 
-  // Inline errors
   const [rawDataError, setRawDataError] = useState("");
   const [winningNumberError, setWinningNumberError] = useState("");
   const [numberOfWinnersError, setNumberOfWinnersError] = useState("");
 
-  // Clear error messages
   const clearErrors = () => {
     setRawDataError("");
     setWinningNumberError("");
     setNumberOfWinnersError("");
   };
 
-  // Parse the raw data
   const parseRawData = (data) => {
     return data
       .split("\n")
@@ -63,7 +53,6 @@ function App() {
       .filter(item => item !== null);
   };
 
-  // "Pick Winners"
   const handleSubmit = (e) => {
     e.preventDefault();
     clearErrors();
@@ -89,13 +78,11 @@ function App() {
 
     const entries = parseRawData(rawData);
 
-    // Whitelist
     const whitelistArray = whitelist
       .split(",")
       .map(name => name.trim())
       .filter(name => name !== "");
 
-    // Filter duplicates 
     const filteredEntries = [];
     const seen = {};
     for (const entry of entries) {
@@ -117,11 +104,9 @@ function App() {
 
     let selectedWinners = [];
     if (exactMatch) {
-      // only those that exactly match the number
       const t = parseFloat(winningNumber);
       selectedWinners = filteredEntries.filter(e => e.number === t);
     } else {
-      // sort by closeness
       const sortedEntries = filteredEntries.sort((a, b) => {
         const diffA = Math.abs(a.number - target);
         const diffB = Math.abs(b.number - target);
@@ -152,7 +137,6 @@ function App() {
     setTimestamp(new Date().toLocaleString());
   };
 
-  // "Reset"
   const handleReset = () => {
     setRawData("");
     setWinningNumber("");
@@ -166,7 +150,6 @@ function App() {
     clearErrors();
   };
 
-  // Presets
   const handlePromoPreset = () => {
     setNumberOfWinners("2");
     setDuplicateMode("first");
@@ -180,12 +163,10 @@ function App() {
     setExactMatch(false);
   };
 
-  // Toggle for "Message Filter"
   const toggleFilterNames = () => {
     setFilterNames(!filterNames);
   };
 
-  // Build final outputs
   const winnersText = winners
     .map(w => {
       const dispName = filterNames ? transformName(w.name) : (w.name || "No Name");
@@ -203,15 +184,12 @@ function App() {
     })
     .join("\n");
 
-  // Winners field glows if we have winners
   const winnersBoxClass = `field ${winners.length > 0 ? "winners-field" : ""}`;
-  // tie/duplicate fields disabled if exactMatch is on
   const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
 
   return (
     <div className="app-outer">
       <div className="app">
-        {/* Header */}
         <header className="header">
           <div className="header-left">who won?</div>
           <div className="header-right"></div>
@@ -226,15 +204,12 @@ function App() {
             </h2>
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-              {/* Raw Data */}
               <div className="field">
-                <label htmlFor="rawData">
+                <label htmlFor="rawData" className="label-with-icon">
                   Raw Data
                   <span className="tooltip">
                     <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      Enter one entry per line: each line should contain a name and a number.
-                    </span>
+                    <span className="tooltiptext">Enter one entry per line: each line should contain a name and a number.</span>
                   </span>
                 </label>
                 <textarea
@@ -247,15 +222,12 @@ function App() {
                 {rawDataError && <div className="field-error">{rawDataError}</div>}
               </div>
 
-              {/* Winning Number */}
               <div className="field">
-                <label htmlFor="winningNumber">
+                <label htmlFor="winningNumber" className="label-with-icon">
                   Winning Number
                   <span className="tooltip">
                     <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      The target number to compare or match exactly.
-                    </span>
+                    <span className="tooltiptext">The target number to compare or match exactly.</span>
                   </span>
                 </label>
                 <input
@@ -268,18 +240,14 @@ function App() {
                 {winningNumberError && <div className="field-error">{winningNumberError}</div>}
               </div>
 
-              {/* Number of Winners & Exact Match Toggle side by side */}
               <div className="field" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                {/* Number of Winners block (possibly grayed if exactMatch) */}
                 <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
                   <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
-                    <div className="num-winners-label">
+                    <div className="num-winners-label label-with-icon">
                       Number of Winners
                       <span className="tooltip">
                         <span className="material-icons">info</span>
-                        <span className="tooltiptext">
-                          How many winners to pick (unless Exact Match is on).
-                        </span>
+                        <span className="tooltiptext">How many winners to pick (unless Exact Match is on).</span>
                       </span>
                     </div>
                   </label>
@@ -295,11 +263,8 @@ function App() {
                   {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
                 </div>
 
-                {/* Exact Match toggle remains active even if exactMatch is on */}
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ marginBottom: "0.3em" }}>
-                    Exact Match
-                  </label>
+                  <label style={{ marginBottom: "0.3em" }}>Exact Match</label>
                   <div className="ios-toggle-container">
                     <div
                       className={`ios-toggle ${exactMatch ? "checked" : ""}`}
@@ -315,10 +280,9 @@ function App() {
                 </div>
               </div>
 
-              {/* Tie & duplicate fields side by side */}
               <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
                 <div className="field" style={{ flex: 1 }}>
-                  <label htmlFor="tieMode">
+                  <label htmlFor="tieMode" className="label-with-icon">
                     Tie Handling
                     <span className="tooltip">
                       <span className="material-icons">info</span>
@@ -339,7 +303,7 @@ function App() {
                 </div>
 
                 <div className="field" style={{ flex: 1 }}>
-                  <label htmlFor="duplicateMode">
+                  <label htmlFor="duplicateMode" className="label-with-icon">
                     Duplicate Handling
                     <span className="tooltip">
                       <span className="material-icons">info</span>
@@ -360,9 +324,8 @@ function App() {
                 </div>
               </div>
 
-              {/* Whitelist */}
               <div className="field">
-                <label htmlFor="whitelist">
+                <label htmlFor="whitelist" className="label-with-icon">
                   Whitelist Names
                   <span className="tooltip">
                     <span className="material-icons">info</span>
@@ -380,28 +343,21 @@ function App() {
                 />
               </div>
 
-              {/* "Pick Winners" button with animated gradient */}
-              <button
-                type="submit"
-                className="primary-btn pick-winners-wide"
-              >
+              <button type="submit" className="primary-btn pick-winners-wide">
                 <span className="material-icons" style={{ fontSize: "1.2rem" }}>done_all</span>
                 Pick Winners
               </button>
             </form>
           </div>
 
-          {/* Right Column: Two stacked panels with .presets-block and .results-block
-              We'll reorder them on mobile so .results-block is first. */}
+          {/* Right Column: .presets-block & .results-block, reorder on mobile */}
           <div className="right" style={{ flexDirection: "column" }}>
-            {/* Presets Panel */}
             <div className="panel presets-block">
               <h2 className="section-title">
                 <span className="material-icons">widgets</span>
                 Presets
               </h2>
               <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
-                {/* "Promo" & "Classic" on the left, with tooltips */}
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <button className="secondary-btn tooltip" onClick={handlePromoPreset}>
                     <span className="material-icons">local_offer</span>
@@ -420,7 +376,6 @@ function App() {
                   </button>
                 </div>
 
-                {/* Reset icon on the right (muted red) */}
                 <div style={{ marginLeft: "auto" }}>
                   <button className="reset-button tooltip" onClick={handleReset}>
                     <span className="material-icons">refresh</span>
@@ -432,24 +387,22 @@ function App() {
               </div>
             </div>
 
-            {/* Results Panel */}
             <div className="panel results-block">
-              {/* Results heading + Message Filter toggle in same line */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.3rem" }}>
-                {/* Left side: heading with icon */}
                 <h2 className="section-title" style={{ marginBottom: 0 }}>
                   <span className="material-icons">list_alt</span>
                   Results
                 </h2>
-                {/* Right side: label & info icon to left of toggle */}
+
+                {/* Message Filter text/icon on left side of toggle */}
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <div className="tooltip" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                  <div className="tooltip label-with-icon" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
                     <span style={{ fontSize: "0.9em" }}>Message Filter</span>
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      When enabled, the second word in each winner’s name is shortened 
-                      by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98". 
-                      Original messages are always unchanged.
+                      When enabled, second word in each winner’s name is shortened
+                      by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98".
+                      Original messages remain unchanged.
                     </span>
                   </div>
 
@@ -472,9 +425,9 @@ function App() {
                 )}
 
                 <div className="field deprioritized">
-                  <label htmlFor="originalOutput">
+                  <label htmlFor="originalOutput" className="label-with-icon">
                     Original Messages
-                    <span className="tooltip">
+                    <span className="tooltip no-transparency">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
                         The original lines from the raw data that correspond to each winner.
@@ -492,9 +445,9 @@ function App() {
                 </div>
 
                 <div className="field deprioritized">
-                  <label htmlFor="differencesOutput">
+                  <label htmlFor="differencesOutput" className="label-with-icon">
                     Name(s) &amp; Difference
-                    <span className="tooltip">
+                    <span className="tooltip no-transparency">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
                         Winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
@@ -511,12 +464,12 @@ function App() {
                 </div>
 
                 <div className={winnersBoxClass}>
-                  <label htmlFor="winnersOutput">
+                  <label htmlFor="winnersOutput" className="label-with-icon">
                     Winners
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
-                        List of winners in the format ":W: Name - number :W:". 
+                        List of winners in the format ":W: Name - number :W:".
                         Name is shortened if "Message Filter" is on.
                       </span>
                     </span>

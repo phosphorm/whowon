@@ -120,6 +120,14 @@ html, body {
 }
 
 /* 
+  "Presets" block specifically – remove extra bottom space:
+  set margin-bottom to 0 if it's the last panel. 
+*/
+.presets-block {
+  margin-bottom: 0; /* remove unnecessary empty space at bottom */
+}
+
+/* 
   Unified heading style for all sections (Inputs, Presets, Results).
   1.2em, matching the old "Presets" heading size.
 */
@@ -137,9 +145,6 @@ html, body {
   On Desktop: .presets-block -> order: 0, .results-block -> order: 1
   On Mobile:  .results-block -> order: 0, .presets-block -> order: 1
 */
-.presets-block {
-  order: 0;
-}
 .results-block {
   order: 1;
 }
@@ -170,11 +175,14 @@ html, body {
   cursor: help;
 }
 
-/* Slight space between label text and info icon for "Number of Winners" */
-.num-winners-label {
+/* Slight space between label text and info icon for headings. 
+   We'll replicate the approach from "Number of Winners." 
+   This class can be used for any heading with an info icon.
+*/
+.label-with-icon {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em; /* add a bit of space before the info icon */
+  gap: 0.4em;
 }
 
 /* Inline error text styling */
@@ -193,7 +201,7 @@ html, body {
 }
 .tooltip .tooltiptext {
   visibility: hidden;
-  opacity: 0;
+  opacity: 1; /* no transparency for these tooltips, for better readability */
   background-color: #333;
   color: #fff;
   text-align: left;
@@ -238,17 +246,17 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* 
-  Base styling for all buttons: 
+  Base styling for all buttons:
   - consistent font weight, 
   - border-radius, 
-  - typical hover and active states for background color & box shadow
+  - typical hover and active states
 */
 button {
   font-family: 'Inter', sans-serif;
   font-size: 0.9em;
-  font-weight: 600;   /* restore consistent font weight */
+  font-weight: 600;   
   border: none;
-  border-radius: 6px; /* keep corners rounded */
+  border-radius: 6px; 
   padding: 0.4em 0.6em; 
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
@@ -272,15 +280,15 @@ button {
 
 /* 
   The pick-winners-wide modifies the primary-btn with an animated gradient. 
-  We'll keep the border-radius and restore the hover effect. 
+  We'll keep the radius and restore the hover effect. 
 */
 .pick-winners-wide {
   width: 100%;
-  min-height: 3rem;         /* taller button */
-  font-size: 1rem;          /* bigger text */
-  justify-content: center;  /* center items horizontally */
-  align-items: center; 
-  border-radius: 6px;       /* keep corners */
+  min-height: 3rem;     
+  font-size: 1rem;      
+  justify-content: center; 
+  align-items: center;
+  border-radius: 6px;
   background: linear-gradient(45deg, #008800, #00cc00, #008800);
   background-size: 200% 200%;
   animation: pickWinnersAnim 4s ease-in-out infinite alternate;
@@ -344,9 +352,7 @@ button {
   font-style: italic;
 }
 
-/* 
-   Deprioritized fields 
-*/
+/* Deprioritized fields */
 .deprioritized {
   opacity: 0.7;
   font-size: 0.9em;
@@ -439,5 +445,5 @@ button {
 .timestamp {
   font-size: 0.85em;
   color: #bbb;
-  margin: 0.3rem 0 0.6rem 0; /* slight margin below */
+  margin: 0.3rem 0 0.6rem 0; 
 }
