@@ -2,305 +2,320 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [rawInput, setRawInput] = useState('');
-  const [target, setTarget] = useState('');
-  const [numWinners, setNumWinners] = useState(1);
-  const [tieMode, setTieMode] = useState('first');
-  const [dupMode, setDupMode] = useState('first');
+  // State hooks for form inputs and modes
+  const [rawData, setRawData] = useState('');
+  const [winningNumber, setWinningNumber] = useState('');
+  const [numberOfWinners, setNumberOfWinners] = useState('');
+  const [tieMode, setTieMode] = useState('first');        // "first" or "all"
+  const [duplicateMode, setDuplicateMode] = useState('first'); // "first" or "last"
   const [whitelist, setWhitelist] = useState('');
+  const [advancedMode, setAdvancedMode] = useState(false); // Toggle for advanced features
   const [winners, setWinners] = useState([]);
-  const [winnersText, setWinnersText] = useState('No winners yet. Enter data and click Pick Winners.');
-  const [originalDataText, setOriginalDataText] = useState('');
+  const [timestamp, setTimestamp] = useState('');
 
-  const handleCalculate = () => {
-    // Split raw input into non-empty lines
-    const lines = rawInput.split('\n').map(line => line.trim()).filter(line => line);
-    if (lines.length === 0) {
-      setWinners([]);
-      setWinnersText('No entries provided.');
-      setOriginalDataText('');
-      return;
-    }
-    // Parse each line into { name, guess, origIndex }
-    const entries = [];
-    lines.forEach((line, idx) => {
-      // Assume last token is the numeric guess, rest is the name
-      const parts = line.split(/\s+/);
-      if (parts.length < 2) return; // skip if not enough parts
-      let guess = parseFloat(parts[parts.length - 1]);
-      if (isNaN(guess)) {
-        // If last part isn't a number, try to extract a number from the line
-        const match = line.match(/[-+]?\d*\.?\d+$/);
+  // Parse raw data input into structured entries
+  const parseRawData = (data) => {
+    return data
+      .split('\n')
+      .map((line, index) => ({ line: line.trim(), index }))
+      .filter(item => item.line.length > 0)
+      .map(({ line, index }) => {
+        // Find the first number in the line (supports comma or dot as decimal)
+        const match = line.match(/([-+]?[0-9]*[.,]?[0-9]+)/);
         if (match) {
-          guess = parseFloat(match[0]);
-          const namePart = line.slice(0, line.lastIndexOf(match[0]));
-          const name = namePart.replace(/[,:-\s]+$/, ''); // trim trailing separators
-          if (name) {
-            entries.push({ name: name, guess: guess, origIndex: idx });
-          }
+          const numberValue = parseFloat(match[0].replace(',', '.'));
+          // Remove the number part from the line to isolate the name
+          const name = line.replace(match[0], '').trim();
+          return { name, number: numberValue, original: line, index };
         }
-      } else {
-        const name = parts.slice(0, -1).join(' ').replace(/[,:-\s]+$/, '');
-        if (name) {
-          entries.push({ name: name, guess: guess, origIndex: idx });
-        }
-      }
-    });
-    if (entries.length === 0) {
-      setWinners([]);
-      setWinnersText('No valid entries found.');
-      setOriginalDataText('');
-      return;
-    }
-    // Validate target number
-    const targetNum = parseFloat(target);
-    if (isNaN(targetNum)) {
-      setWinners([]);
-      setWinnersText('Please enter a valid target number.');
-      setOriginalDataText('');
-      return;
-    }
-    // Validate number of winners (minimum 1)
-    let winnersCount = parseInt(numWinners, 10);
-    if (isNaN(winnersCount) || winnersCount < 1) {
-      winnersCount = 1;
-    }
-    // Prepare whitelist set of names
-    const whitelistNames = whitelist.split(/[,\n]+/).map(name => name.trim()).filter(name => name);
-    const whitelistSet = new Set(whitelistNames);
+        return null;
+      })
+      .filter(item => item !== null);
+  };
 
-    // Apply duplicate-name handling
+  // Main form submission handler
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let entries = parseRawData(rawData);
+    const target = parseFloat(winningNumber);
+    const winnersCount = parseInt(numberOfWinners, 10);
+
+    if (isNaN(target) || isNaN(winnersCount) || winnersCount < 1) {
+      alert("Please enter valid numbers for Winning Number and Number of Winners.");
+      return;
+    }
+
+    // Process whitelist: split by comma or newline
+    const whitelistArray = whitelist
+      .split(/[,\n]+/)
+      .map(name => name.trim())
+      .filter(name => name !== "");
+
+    // Filter duplicates according to duplicateMode (except whitelisted names)
     const filteredEntries = [];
-    if (dupMode === 'first') {
-      const seenNames = new Set();
-      entries.forEach(entry => {
-        if (whitelistSet.has(entry.name)) {
-          // Keep all entries for whitelisted names
-          filteredEntries.push(entry);
-        } else if (!seenNames.has(entry.name)) {
-          seenNames.add(entry.name);
-          filteredEntries.push(entry);
+    const seen = {};
+    for (const entry of entries) {
+      if (whitelistArray.includes(entry.name)) {
+        // Keep all entries for whitelisted names
+        filteredEntries.push(entry);
+      } else {
+        if (!(entry.name in seen)) {
+          seen[entry.name] = entry;
+        } else {
+          if (duplicateMode === "last") {
+            // Replace with the latest entry for this name
+            seen[entry.name] = entry;
+          }
+          // If mode is "first", do nothing (keep the first entry already seen)
         }
-        // If name already seen and not whitelisted, skip the entry
-      });
-    } else if (dupMode === 'last') {
-      const seenNames = new Set();
-      const reversedToKeep = [];
-      for (let i = entries.length - 1; i >= 0; i--) {
-        const entry = entries[i];
-        if (whitelistSet.has(entry.name)) {
-          reversedToKeep.push(entry);
-        } else if (!seenNames.has(entry.name)) {
-          seenNames.add(entry.name);
-          reversedToKeep.push(entry);
-        }
-        // If name already seen and not whitelisted, skip earlier entry
       }
-      reversedToKeep.reverse(); // restore original order for kept entries
-      filteredEntries.push(...reversedToKeep);
-    } else {
-      // If an unexpected mode, default to using all entries
-      filteredEntries.push(...entries);
+    }
+    // Add all the kept entries from seen (for non-whitelisted unique names)
+    for (const name in seen) {
+      filteredEntries.push(seen[name]);
     }
 
-    if (filteredEntries.length === 0) {
-      setWinners([]);
-      setWinnersText('No entries remaining after applying duplicate filter.');
-      setOriginalDataText('');
-      return;
-    }
-    // Calculate difference from target for each entry
-    filteredEntries.forEach(entry => {
-      entry.diff = Math.abs(entry.guess - targetNum);
-    });
-    // Sort by diff ascending; tie-break by original input order
-    filteredEntries.sort((a, b) => {
-      if (a.diff !== b.diff) {
-        return a.diff - b.diff;
-      } else {
-        return a.origIndex - b.origIndex;
+    // Sort entries by closeness to the target number
+    const sortedEntries = filteredEntries.sort((a, b) => {
+      const diffA = Math.abs(a.number - target);
+      const diffB = Math.abs(b.number - target);
+      if (diffA === diffB) {
+        return a.index - b.index;  // tie-break by original order
       }
+      return diffA - diffB;
     });
-    // Clamp number of winners to available entries
-    if (winnersCount > filteredEntries.length) {
-      winnersCount = filteredEntries.length;
-    }
-    // Select top N entries as winners
-    let selected = filteredEntries.slice(0, winnersCount);
-    // If tie mode is 'all', include all entries tying with the last winner's diff
-    if (selected.length > 0 && tieMode === 'all') {
-      const cutoffDiff = selected[selected.length - 1].diff;
-      for (let i = winnersCount; i < filteredEntries.length; i++) {
-        if (filteredEntries[i].diff === cutoffDiff) {
-          selected.push(filteredEntries[i]);
+
+    // Determine winners based on tie mode
+    let selectedWinners = sortedEntries.slice(0, winnersCount);
+    if (tieMode === "all" && selectedWinners.length > 0) {
+      // Include all entries that tie with the last winner's diff
+      const lastDiff = Math.abs(selectedWinners[selectedWinners.length - 1].number - target);
+      for (let i = winnersCount; i < sortedEntries.length; i++) {
+        const diff = Math.abs(sortedEntries[i].number - target);
+        if (diff === lastDiff) {
+          selectedWinners.push(sortedEntries[i]);
         } else {
           break;
         }
       }
     }
-    setWinners(selected);
-    if (selected.length > 0) {
-      // Generate output text for winners
-      const winnersLines = selected.map(entry => {
-        const diffDisplay = Number.isInteger(entry.diff) ? entry.diff : entry.diff.toFixed(2);
-        return entry.diff !== undefined
-          ? `${entry.name} – ${entry.guess} (Diff: ${diffDisplay})`
-          : `${entry.name} – ${entry.guess}`;
-      });
-      setWinnersText(winnersLines.join('\n'));
-      // Collect original lines for each winner
-      const originalLines = selected.map(entry => lines[entry.origIndex]);
-      setOriginalDataText(originalLines.join('\n'));
-    } else {
-      setWinnersText('No winners found.');
-      setOriginalDataText('');
-    }
+
+    setWinners(selectedWinners);
+    setTimestamp(new Date().toLocaleString());
   };
 
+  // Reset handler to clear all fields and state
   const handleReset = () => {
-    setRawInput('');
-    setTarget('');
-    setNumWinners(1);
+    setRawData('');
+    setWinningNumber('');
+    setNumberOfWinners('');
     setTieMode('first');
-    setDupMode('first');
+    setDuplicateMode('first');
     setWhitelist('');
+    setAdvancedMode(false);
     setWinners([]);
-    setWinnersText('No winners yet. Enter data and click Pick Winners.');
-    setOriginalDataText('');
+    setTimestamp('');
   };
+
+  // Prepare text outputs for winners and original data (for the textareas)
+  const winnersText = winners
+    .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
+    .join("\\n");
+  const originalDataText = winners.map(w => w.original).join("\\n");
 
   return (
     <div className="app">
-      <h1>Closest Number Winners Picker</h1>
-      <div className="field">
-        <label htmlFor="rawInput">
-          Entries Input 
-          <span className="tooltip">ℹ️
-            <span className="tooltiptext">
-              List of name and number guesses, one per line (e.g. "Alice 42")
-            </span>
-          </span>
-        </label>
-        <textarea
-          id="rawInput"
-          rows="6"
-          value={rawInput}
-          onChange={e => setRawInput(e.target.value)}
-          placeholder={"e.g.\nAlice 42\nBob 100\nCharlie 77"}
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="target">
-          Target Number 
-          <span className="tooltip">ℹ️
-            <span className="tooltiptext">The target number to compare guesses against</span>
-          </span>
-        </label>
-        <input
-          id="target"
-          type="number"
-          value={target}
-          onChange={e => setTarget(e.target.value)}
-          placeholder="Enter target"
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="numWinners">
-          Number of Winners 
-          <span className="tooltip">ℹ️
-            <span className="tooltiptext">
-              How many winners to pick (tied winners are included if tie handling is "all")
-            </span>
-          </span>
-        </label>
-        <input
-          id="numWinners"
-          type="number"
-          value={numWinners}
-          onChange={e => setNumWinners(e.target.value)}
-          min="1"
-          step="1"
-          placeholder="1"
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="tieMode">
-          Tie Handling 
-          <span className="tooltip">ℹ️
-            <span className="tooltiptext">
-              If multiple guesses are equally close, pick only the first one (input order) or include all tied entries
-            </span>
-          </span>
-        </label>
-        <select
-          id="tieMode"
-          value={tieMode}
-          onChange={e => setTieMode(e.target.value)}
-        >
-          <option value="first">First Only</option>
-          <option value="all">Include All Ties</option>
-        </select>
-      </div>
-      <div className="field">
-        <label htmlFor="dupMode">
-          Duplicate Handling 
-          <span className="tooltip">ℹ️
-            <span className="tooltiptext">
-              If a name has multiple entries, keep either their first entry or their last entry
-            </span>
-          </span>
-        </label>
-        <select
-          id="dupMode"
-          value={dupMode}
-          onChange={e => setDupMode(e.target.value)}
-        >
-          <option value="first">Keep First Entry</option>
-          <option value="last">Keep Last Entry</option>
-        </select>
-      </div>
-      <div className="field">
-        <label htmlFor="whitelist">
-          Whitelist Names 
-          <span className="tooltip">ℹ️
-            <span className="tooltiptext">
-              Names (comma or newline separated) whose entries should always be kept (no duplicate removal)
-            </span>
-          </span>
-        </label>
-        <textarea
-          id="whitelist"
-          rows="2"
-          value={whitelist}
-          onChange={e => setWhitelist(e.target.value)}
-          placeholder="e.g. Alice, Bob"
-        />
-      </div>
-      <div className="buttons">
-        <button type="button" className="primary-btn" onClick={handleCalculate}>
-          Pick Winners
-        </button>
-        <button type="button" className="secondary-btn" onClick={handleReset}>
-          Reset
-        </button>
-      </div>
-      <div className="results">
-        <h2>Winners</h2>
-        <textarea
-          id="winnersOutput"
-          readOnly
-          rows="5"
-          value={winnersText}
-        />
-        <h2>Original Data</h2>
-        <textarea
-          id="originalOutput"
-          readOnly
-          rows="5"
-          value={originalDataText}
-          placeholder="Original entries of winners will appear here."
-        />
-      </div>
+      {/* Header with title, logo placeholder, and Reset button */}
+      <header className="header">
+        <h1 className="app-title">Closest Number Picker</h1>
+        <div className="header-right">
+          {/* Placeholder for an SVG logo on the right side */}
+          <div className="logo-placeholder" aria-hidden="true"></div>
+          {/* Reset button with refresh icon */}
+          <button type="button" className="reset-btn" onClick={handleReset}>
+            <span className="material-icons">refresh</span> Reset
+          </button>
+        </div>
+      </header>
+
+      {/* Main form content in two columns */}
+      <form onSubmit={handleSubmit}>
+        <div className="content">
+          {/* Left Column: Entries Input and Number of Winners */}
+          <div className="left">
+            <div className="field">
+              <label htmlFor="rawData">
+                Entries Input 
+                <span className="tooltip">
+                  <span className="material-icons">info</span>
+                  <span className="tooltiptext">
+                    List each entry as "Name guess" on a new line (e.g., "Alice 42").
+                  </span>
+                </span>
+              </label>
+              <textarea
+                id="rawData"
+                rows="6"
+                value={rawData}
+                onChange={(e) => setRawData(e.target.value)}
+                placeholder="e.g. Alice 42\nBob 100\nCharlie 77"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="numberOfWinners">
+                Number of Winners 
+                <span className="tooltip">
+                  <span className="material-icons">info</span>
+                  <span className="tooltiptext">
+                    How many winners to pick. If ties occur and tie handling is "All", more names may be included.
+                  </span>
+                </span>
+              </label>
+              <input
+                id="numberOfWinners"
+                type="number"
+                value={numberOfWinners}
+                onChange={(e) => setNumberOfWinners(e.target.value)}
+                placeholder="Enter number of winners"
+                min="1"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Winning Number, Advanced options, and Submit button */}
+          <div className="right">
+            <div className="field">
+              <label htmlFor="winningNumber">
+                Winning Number 
+                <span className="tooltip">
+                  <span className="material-icons">info</span>
+                  <span className="tooltiptext">
+                    The target number to compare guesses against.
+                  </span>
+                </span>
+              </label>
+              <input
+                id="winningNumber"
+                type="number"
+                value={winningNumber}
+                onChange={(e) => setWinningNumber(e.target.value)}
+                placeholder="Enter winning number"
+              />
+            </div>
+
+            {/* Advanced Mode Toggle */}
+            <div className="field advanced-toggle-field">
+              <button
+                type="button"
+                className={`advanced-toggle ${advancedMode ? 'on' : 'off'}`}
+                onClick={() => setAdvancedMode(!advancedMode)}
+                aria-pressed={advancedMode}
+              >
+                <span className="material-icons">
+                  {advancedMode ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+                Advanced Mode
+              </button>
+            </div>
+
+            {/* Tie and Duplicate Handling (Advanced Options) */}
+            <div className="inline-fields">
+              <div 
+                className={`field ${!advancedMode ? 'disabled-field tooltip' : ''}`}
+              >
+                <label htmlFor="tieMode">
+                  Tie Handling
+                </label>
+                {/* Dropdown or radio options for tie handling */}
+                <select
+                  id="tieMode"
+                  value={tieMode}
+                  onChange={(e) => setTieMode(e.target.value)}
+                  disabled={!advancedMode}
+                >
+                  <option value="first">First Only</option>
+                  <option value="all">Include All Ties</option>
+                </select>
+                {!advancedMode && (
+                  <span className="tooltiptext">Enable Advanced Mode to use this feature</span>
+                )}
+              </div>
+              <div 
+                className={`field ${!advancedMode ? 'disabled-field tooltip' : ''}`}
+              >
+                <label htmlFor="duplicateMode">
+                  Duplicate Handling
+                </label>
+                <select
+                  id="duplicateMode"
+                  value={duplicateMode}
+                  onChange={(e) => setDuplicateMode(e.target.value)}
+                  disabled={!advancedMode}
+                >
+                  <option value="first">Keep First Entry</option>
+                  <option value="last">Keep Last Entry</option>
+                </select>
+                {!advancedMode && (
+                  <span className="tooltiptext">Enable Advanced Mode to use this feature</span>
+                )}
+              </div>
+            </div>
+
+            {/* Whitelist Input (Advanced Option) */}
+            <div className={`field ${!advancedMode ? 'disabled-field tooltip' : ''}`}>
+              <label htmlFor="whitelist">
+                Whitelist Names 
+              </label>
+              <textarea
+                id="whitelist"
+                rows="2"
+                value={whitelist}
+                onChange={(e) => setWhitelist(e.target.value)}
+                placeholder="e.g. Alice, Bob"
+                disabled={!advancedMode}
+              />
+              {!advancedMode && (
+                <span className="tooltiptext">Enable Advanced Mode to use this feature</span>
+              )}
+            </div>
+
+            {/* Submit/Pick Winners Button */}
+            <button type="submit" className="pick-winners-btn">
+              <span className="material-icons">military_tech</span> {/* an icon for winning, e.g., medal */}
+              Pick Winners
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {/* Results Section: Winners and Original Data outputs (shown after submission) */}
+      {winners.length > 0 && (
+        <div className="results">
+          <div className="output-section">
+            <h2>Winners</h2>
+            <p><strong>Timestamp:</strong> {timestamp}</p>
+            <label htmlFor="winnersOutput">Winners Output:</label>
+            <textarea
+              id="winnersOutput"
+              className="output-textarea"
+              readOnly
+              rows="5"
+              value={winnersText}
+            />
+          </div>
+          <div className="output-section">
+            <h2>Original Data</h2>
+            <label htmlFor="originalOutput">Original Data for Winners:</label>
+            <textarea
+              id="originalOutput"
+              className="output-textarea"
+              readOnly
+              rows="5"
+              value={originalDataText}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
