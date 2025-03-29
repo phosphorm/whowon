@@ -14,29 +14,86 @@ function transformName(originalName) {
 }
 
 function App() {
+  // Fields
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
   const [tieMode, setTieMode] = useState("all");
+  // Duplicate is now always enabled, even if exact match is on
   const [duplicateMode, setDuplicateMode] = useState("first");
   const [exactMatch, setExactMatch] = useState(false);
   const [whitelist, setWhitelist] = useState("");
   const [filterNames, setFilterNames] = useState(true);
 
+  // New toggle: autoReset. On by default.
+  const [autoReset, setAutoReset] = useState(true);
+
+  // Winners & metadata
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
 
+  // Errors
   const [rawDataError, setRawDataError] = useState("");
   const [winningNumberError, setWinningNumberError] = useState("");
   const [numberOfWinnersError, setNumberOfWinnersError] = useState("");
 
-  const clearErrors = () => {
+  // Quick function to clear results if autoReset is on
+  function maybeResetResults() {
+    if (autoReset) {
+      setWinners([]);
+      setTimestamp("");
+    }
+  }
+
+  function clearErrors() {
     setRawDataError("");
     setWinningNumberError("");
     setNumberOfWinnersError("");
+  }
+
+  // OnChange handlers for input fields: if autoReset is on, we reset winners
+  const handleRawDataChange = (e) => {
+    setRawData(e.target.value);
+    maybeResetResults();
+  };
+  const handleWinningNumberChange = (e) => {
+    setWinningNumber(e.target.value);
+    maybeResetResults();
+  };
+  const handleNumberOfWinnersChange = (e) => {
+    setNumberOfWinners(e.target.value);
+    maybeResetResults();
+  };
+  const handleTieModeChange = (e) => {
+    setTieMode(e.target.value);
+    maybeResetResults();
+  };
+  const handleDuplicateModeChange = (e) => {
+    setDuplicateMode(e.target.value);
+    maybeResetResults();
+  };
+  const handleWhitelistChange = (e) => {
+    setWhitelist(e.target.value);
+    maybeResetResults();
   };
 
-  const parseRawData = (data) => {
+  // Exact match toggle: if turning ON, reset numberOfWinners to "" 
+  // and maybe reset results if autoReset is on
+  const handleExactMatchToggle = () => {
+    const newVal = !exactMatch;
+    setExactMatch(newVal);
+    if (!exactMatch) {
+      setNumberOfWinners("");
+    }
+    maybeResetResults();
+  };
+
+  // Toggling the autoReset
+  const handleAutoResetToggle = () => {
+    setAutoReset(!autoReset);
+  };
+
+  function parseRawData(data) {
     return data
       .split("\n")
       .map((line, index) => ({ line: line.trim(), index }))
@@ -51,7 +108,7 @@ function App() {
         return null;
       })
       .filter(item => item !== null);
-  };
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -83,6 +140,7 @@ function App() {
       .map(name => name.trim())
       .filter(name => name !== "");
 
+    // Filter duplicates
     const filteredEntries = [];
     const seen = {};
     for (const entry of entries) {
@@ -104,8 +162,7 @@ function App() {
 
     let selectedWinners = [];
     if (exactMatch) {
-      const t = parseFloat(winningNumber);
-      selectedWinners = filteredEntries.filter(e => e.number === t);
+      selectedWinners = filteredEntries.filter(e => e.number === parseFloat(winningNumber));
     } else {
       const sortedEntries = filteredEntries.sort((a, b) => {
         const diffA = Math.abs(a.number - target);
@@ -155,18 +212,21 @@ function App() {
     setDuplicateMode("first");
     setTieMode("first");
     setExactMatch(false);
+    maybeResetResults();
   };
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
     setTieMode("all");
     setExactMatch(false);
+    maybeResetResults();
   };
 
   const toggleFilterNames = () => {
     setFilterNames(!filterNames);
   };
 
+  // Build final outputs
   const winnersText = winners
     .map(w => {
       const dispName = filterNames ? transformName(w.name) : (w.name || "No Name");
@@ -185,14 +245,32 @@ function App() {
     .join("\n");
 
   const winnersBoxClass = `field ${winners.length > 0 ? "winners-field" : ""}`;
-  const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
 
   return (
     <div className="app-outer">
       <div className="app">
         <header className="header">
-          <div className="header-left">who won?</div>
-          <div className="header-right"></div>
+          <div className="header-left">
+            who won?
+          </div>
+          <div className="header-right">
+            {/* New auto-reset toggle */}
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <div className="tooltip label-with-icon" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                <span style={{ fontSize: "0.9em" }}>Auto-Reset Results</span>
+                <span className="material-icons" style={{ fontSize: "18px", color: "#888" }}>info</span>
+                <span className="tooltiptext">
+                  When enabled, modifying any input fields automatically clears the results section.
+                </span>
+              </div>
+              <div className="ios-toggle-container">
+                <div
+                  className={`ios-toggle ${autoReset ? "checked" : ""}`}
+                  onClick={handleAutoResetToggle}
+                />
+              </div>
+            </div>
+          </div>
         </header>
 
         <main className="content">
@@ -215,7 +293,7 @@ function App() {
                   id="rawData"
                   rows="8"
                   value={rawData}
-                  onChange={(e) => setRawData(e.target.value)}
+                  onChange={handleRawDataChange}
                   placeholder="Paste your raw data here (one name and number per line)..."
                 />
                 {rawDataError && <div className="field-error">{rawDataError}</div>}
@@ -233,14 +311,14 @@ function App() {
                   id="winningNumber"
                   type="text"
                   value={winningNumber}
-                  onChange={(e) => setWinningNumber(e.target.value)}
+                  onChange={handleWinningNumberChange}
                   placeholder="Enter the winning number"
                 />
                 {winningNumberError && <div className="field-error">{winningNumberError}</div>}
               </div>
 
               <div className="field" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
+                <div style={{ flex: 1 }} className={!exactMatch ? "" : ""}>
                   <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
                     <div className="label-with-icon">
                       Number of Winners
@@ -254,7 +332,7 @@ function App() {
                     id="numberOfWinners"
                     type="number"
                     value={numberOfWinners}
-                    onChange={(e) => setNumberOfWinners(e.target.value)}
+                    onChange={handleNumberOfWinnersChange}
                     placeholder="Enter number of winners"
                     min="1"
                     disabled={exactMatch}
@@ -267,19 +345,19 @@ function App() {
                   <div className="ios-toggle-container">
                     <div
                       className={`ios-toggle ${exactMatch ? "checked" : ""}`}
-                      onClick={() => setExactMatch(!exactMatch)}
+                      onClick={handleExactMatchToggle}
                     />
                     <span className="tooltip">
-                      <span className="material-icons">info</span>
+                      <span className="material-icons" style={{ fontSize: "18px", color: "#888" }}>info</span>
                       <span className="tooltiptext">
-                        Only pick entries whose number matches exactly; tie &amp; duplicate settings won't apply.
+                        Only pick entries whose number matches exactly. Tie handling is disabled. 
                       </span>
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
+              <div style={{ display: "flex", gap: "1rem" }}>
                 <div className="field" style={{ flex: 1 }}>
                   <label htmlFor="tieMode" className="label-with-icon">
                     Tie Handling
@@ -293,7 +371,7 @@ function App() {
                   <select
                     id="tieMode"
                     value={tieMode}
-                    onChange={(e) => setTieMode(e.target.value)}
+                    onChange={handleTieModeChange}
                     disabled={exactMatch}
                   >
                     <option value="all">Include Ties</option>
@@ -314,8 +392,7 @@ function App() {
                   <select
                     id="duplicateMode"
                     value={duplicateMode}
-                    onChange={(e) => setDuplicateMode(e.target.value)}
-                    disabled={exactMatch}
+                    onChange={handleDuplicateModeChange}
                   >
                     <option value="first">Keep First</option>
                     <option value="last">Keep Last</option>
@@ -337,7 +414,7 @@ function App() {
                   id="whitelist"
                   type="text"
                   value={whitelist}
-                  onChange={(e) => setWhitelist(e.target.value)}
+                  onChange={handleWhitelistChange}
                   placeholder="e.g. Marko K, Ville W"
                 />
               </div>
@@ -395,7 +472,7 @@ function App() {
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                   <div className="tooltip label-with-icon" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
                     <span style={{ fontSize: "0.9em" }}>Message Filter</span>
-                    <span className="material-icons">info</span>
+                    <span className="material-icons" style={{ fontSize: "18px", color: "#888" }}>info</span>
                     <span className="tooltiptext">
                       When enabled, second word in each winner’s name is shortened
                       by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98".

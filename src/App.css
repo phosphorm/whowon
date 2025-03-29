@@ -18,13 +18,12 @@ html, body {
 
 /* 
   Outer container for vertical & horizontal centering.
-  If content exceeds the viewport, it scrolls. Otherwise, it's fully centered.
 */
 .app-outer {
   min-height: 100vh;
   display: flex;
-  justify-content: center;  /* center horizontally */
-  align-items: center;      /* center vertically */
+  justify-content: center;  
+  align-items: center;      
   flex-direction: column;
   box-sizing: border-box;
 }
@@ -62,7 +61,7 @@ html, body {
 /* Header: within .app, so it won't exceed columns */
 .header {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   background: #0f0f0f;
@@ -73,15 +72,20 @@ html, body {
 .header .header-left {
   font-size: 1.2rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
 }
 .header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   font-size: 0.95rem;
   color: #aaa;
 }
 .header .header-right a {
   color: #aaa;
   text-decoration: none;
-  margin-left: 1rem;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -119,15 +123,11 @@ html, body {
   margin-bottom: 1rem; /* default spacing below each panel */
 }
 
-/* 
-  "Presets" block: Remove extra bottom space *inside* the panel,
-  but keep the panel's margin-bottom for spacing to the next panel.
-*/
 .presets-block {
-  /* We'll remove bottom margin/padding from the panel's *content*, not from the panel itself. */
+  margin-bottom: 0; 
 }
 .presets-block > *:last-child {
-  margin-bottom: 0 !important; /* remove extra bottom margin from the last child row if any */
+  margin-bottom: 0 !important;
 }
 
 /* 
@@ -173,8 +173,6 @@ html, body {
   cursor: help;
 }
 
-/* Slight space between heading text and info icon for headings. 
-   This class can be used on the label or heading with an icon. */
 .label-with-icon {
   display: inline-flex;
   align-items: center;
@@ -197,7 +195,7 @@ html, body {
 }
 .tooltip .tooltiptext {
   visibility: hidden;
-  opacity: 1; /* no transparency for better readability */
+  opacity: 1; 
   background-color: #333;
   color: #fff;
   text-align: left;
@@ -243,9 +241,6 @@ input:focus, textarea:focus, select:focus {
 
 /* 
   Base styling for all buttons:
-  - consistent font weight, 
-  - border-radius, 
-  - typical hover and active states
 */
 button {
   font-family: 'Inter', sans-serif;
@@ -274,10 +269,7 @@ button {
   background-color: #007500;
 }
 
-/* 
-  The pick-winners-wide modifies the primary-btn with an animated gradient. 
-  We'll keep the radius and restore the hover effect. 
-*/
+/* pick-winners-wide modifies the primary-btn with an animated gradient. */
 .pick-winners-wide {
   width: 100%;
   min-height: 3rem;     
@@ -297,7 +289,6 @@ button {
   box-shadow: none;
 }
 
-/* Animated gradient for the pick-winners-wide button */
 @keyframes pickWinnersAnim {
   0% {
     background-position: 0% 50%;
@@ -337,29 +328,15 @@ button {
   background-color: #3a3a3a;
 }
 
-/* Results / output styling */
-.results {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-.no-winners {
-  color: #888;
-  font-style: italic;
-}
-
-/* 
-  Instead of partial opacity, we use a more muted color for 
-  "Original Messages" and "Name(s) & Difference" sections
+/* Instead of partial opacity, we use a more muted color for 
+   Original Messages and Name(s) & Difference
 */
 .deprioritized {
-  color: #aaa;        /* more subdued color */
+  color: #aaa;     
   font-size: 0.9em;
 }
 
-/* 
-  Smooth ring-style glow around the winners field (if winners exist).
-*/
+/* winners-field ring glow */
 .winners-field {
   position: relative;
   margin-bottom: 1rem;
@@ -430,9 +407,7 @@ button {
   pointer-events: none;
 }
 
-/* Smaller, less prominent timestamp
-   Additional space below it for the first box 
-*/
+/* Smaller, less prominent timestamp */
 .timestamp {
   font-size: 0.85em;
   color: #bbb;
