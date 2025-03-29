@@ -3,6 +3,12 @@ import "./App.css";
 
 /**
  * Transform the name if the 'Message Filter' is on.
+ * Examples:
+ *  "Satu-Maarit Nheyksj" -> "Satu-Maarit N"
+ *  "Ben Bowej98"         -> "Ben B"
+ *  "Ack N€923"           -> "Ack N"
+ *  "Olek P92.0EUR"       -> "Olek P"
+ *  "Yousef O$0.23"       -> "Yousef O"
  */
 function transformName(originalName) {
   const words = originalName.trim().split(/\s+/);
@@ -52,7 +58,6 @@ function App() {
       .map((line, index) => ({ line: line.trim(), index }))
       .filter(item => item.line.length > 0)
       .map(({ line, index }) => {
-        // extract first number pattern
         const match = line.match(/([-+]?[0-9]*[.,]?[0-9]+)/);
         if (match) {
           const numberValue = parseFloat(match[0].replace(",", "."));
@@ -449,7 +454,7 @@ function App() {
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
                       When enabled, the second word in each winner’s name is shortened 
-                      by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98". 
+                      by removing digits/currency, e.g. "Ben Bowej98" -> "Ben B". 
                       Original messages are always unchanged.
                     </span>
                   </div>

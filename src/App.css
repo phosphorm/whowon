@@ -121,7 +121,7 @@ html, body {
 
 /* 
   Unified heading style for all sections (Inputs, Presets, Results).
-  Matches the size of the Presets one => 1.2em.
+  1.2em, matching the old "Presets" heading size.
 */
 .section-title {
   font-size: 1.2em;  
@@ -238,8 +238,41 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* 
-  The "Pick Winners" button is now taller, with bigger font & 
-  an animated gradient background. We'll center everything inside it. 
+  Base styling for all buttons: 
+  - consistent font weight, 
+  - border-radius, 
+  - typical hover and active states for background color & box shadow
+*/
+button {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;   /* restore consistent font weight */
+  border: none;
+  border-radius: 6px; /* keep corners rounded */
+  padding: 0.4em 0.6em; 
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+/* Primary Button: standard green background, hover/active states */
+.primary-btn {
+  background-color: #008800;
+  color: #ffffff;
+}
+.primary-btn:hover {
+  background-color: #00aa00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+.primary-btn:active {
+  background-color: #007500;
+}
+
+/* 
+  The pick-winners-wide modifies the primary-btn with an animated gradient. 
+  We'll keep the border-radius and restore the hover effect. 
 */
 .pick-winners-wide {
   width: 100%;
@@ -247,11 +280,20 @@ input:focus, textarea:focus, select:focus {
   font-size: 1rem;          /* bigger text */
   justify-content: center;  /* center items horizontally */
   align-items: center; 
+  border-radius: 6px;       /* keep corners */
   background: linear-gradient(45deg, #008800, #00cc00, #008800);
   background-size: 200% 200%;
-  animation: pickWinnersAnim 4s ease-in-out infinite alternate; /* subtle shift */
+  animation: pickWinnersAnim 4s ease-in-out infinite alternate;
+}
+.pick-winners-wide:hover {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+}
+.pick-winners-wide:active {
+  background-position: 70% 50%;
+  box-shadow: none;
 }
 
+/* Animated gradient for the pick-winners-wide button */
 @keyframes pickWinnersAnim {
   0% {
     background-position: 0% 50%;
@@ -261,7 +303,7 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* Muted red for reset button */
+/* Muted red for reset button, keep corners, hover, etc. */
 .reset-button {
   width: 2rem;
   height: 2rem;
@@ -278,6 +320,7 @@ input:focus, textarea:focus, select:focus {
   background-color: #993333;
 }
 
+/* Secondary button base */
 .secondary-btn {
   background-color: #444444;
   color: #ffffff;
@@ -317,23 +360,36 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* 
-   Winners field glows if there are winners. 
-   We'll add an animated glow around the box that pulses.
+  Smooth ring-style glow around the winners field (if winners exist).
+  We do this with a pseudo-element that runs around the perimeter. 
 */
 .winners-field {
-  border-radius: 8px;
+  position: relative;
   margin-bottom: 1rem;
-  padding: 0.8rem; 
-  animation: winnersGlow 2s infinite alternate; 
-  /* We'll override the box-shadow in the animation */
+  padding: 0.8rem;
 }
-
-@keyframes winnersGlow {
+.winners-field::before {
+  content: "";
+  position: absolute;
+  top: -4px; left: -4px; 
+  right: -4px; bottom: -4px; 
+  border-radius: 8px;
+  border: 2px solid transparent;
+  pointer-events: none; 
+  animation: ringPulse 2.5s infinite;
+}
+@keyframes ringPulse {
   0% {
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 2px rgba(0,255,0,0.3);
+    border-color: rgba(0,255,0,0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(0,255,0,0.6);
+    border-color: rgba(0,255,0,0.6);
   }
   100% {
-    box-shadow: 0 0 20px rgba(0,255,0,0.7);
+    box-shadow: 0 0 2px rgba(0,255,0,0.3);
+    border-color: rgba(0,255,0,0.3);
   }
 }
 
