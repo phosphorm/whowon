@@ -1,30 +1,45 @@
+/* Import a clean sans-serif font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 /* Overall dark theme styling */
 body {
   background-color: #121212;
   color: #e0e0e0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
 }
 
 .App {
   max-width: 900px;
-  margin: 20px auto;
-  padding: 20px;
+  margin: 30px auto;
+  padding: 30px;
   background-color: #1e1e1e;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
 }
 
-h1, h2 {
-  color: #ffffff;
+/* Header styling */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
   text-align: center;
+  color: #ffffff;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #ffffff;
 }
 
 /* Form container using flex for two columns */
 .form-container {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   flex-wrap: wrap;
 }
 
@@ -44,8 +59,10 @@ h1, h2 {
 }
 
 label {
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 0.95rem;
   margin-bottom: 5px;
+  color: #cfcfcf;
 }
 
 /* Input and textarea styling */
@@ -55,10 +72,16 @@ textarea {
   border: 1px solid #444;
   border-radius: 4px;
   color: #e0e0e0;
-  padding: 8px;
+  padding: 10px;
   font-size: 0.95rem;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: #8a8a8a;
 }
 
 /* Button styling */
@@ -67,23 +90,26 @@ button {
   border: none;
   border-radius: 4px;
   color: #e0e0e0;
-  padding: 10px 20px;
+  padding: 10px 25px;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+  margin-right: 10px;
 }
 
 button:hover {
   background-color: #555;
+  transform: translateY(-2px);
 }
 
 /* Special styling for grouped sections with reduced padding/margins */
 .tie-mode,
 .duplicate-mode {
   background-color: #2c2c2c;
-  padding: 6px 10px; /* Reduced padding */
+  padding: 6px 10px;
   border-radius: 4px;
-  margin-bottom: 5px; /* Reduced margin */
+  margin-bottom: 5px;
   font-size: 0.9rem;
 }
 
@@ -93,11 +119,30 @@ button:hover {
   border-radius: 4px;
 }
 
+/* Add a subtle border and spacing for the winners output */
+#winnersOutput {
+  resize: vertical;
+  min-height: 120px;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.95rem;
+}
+
 /* Results section styling */
 .results {
-  margin-top: 20px;
+  margin-top: 30px;
   background-color: #2c2c2c;
-  padding: 15px;
+  padding: 20px;
   border-radius: 5px;
   text-align: center;
+  font-size: 0.95rem;
+}
+
+/* Timestamp styling */
+.results p {
+  margin: 5px 0;
+  color: #cccccc;
 }
