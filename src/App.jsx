@@ -129,7 +129,7 @@ function App() {
     <div className="app">
       {/* Header wraps on small screens */}
       <header className="header">
-        {/* Heading changed to "who won?" */}
+        {/* Heading changed to "who won?" earlier */}
         <div className="header-left">who won?</div>
         <div className="header-right">
           {/* Additional links or content could go here */}
@@ -141,7 +141,7 @@ function App() {
         {/* Input Panel */}
         <div className="left panel">
           <h1>Inputs</h1>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
             <div className="field">
               <label htmlFor="rawData">
                 Raw Data 
@@ -262,9 +262,14 @@ function App() {
               />
             </div>
 
+            {/* Button row - now swapped: Reset is left, Pick Winners is right */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1rem" }}>
-              <button type="submit" className="primary-btn">Pick Winners</button>
-              <button type="button" className="secondary-btn" onClick={handleReset}>Reset</button>
+              <button type="button" className="secondary-btn" onClick={handleReset}>
+                Reset
+              </button>
+              <button type="submit" className="primary-btn">
+                Pick Winners
+              </button>
             </div>
           </form>
         </div>
@@ -272,6 +277,7 @@ function App() {
         {/* Results Panel */}
         <div className="right panel">
           <h1>Results</h1>
+          {/* We let .results fill all space */}
           <div className="results">
             {timestamp ? (
               <p><strong>Timestamp:</strong> {timestamp}</p>
@@ -279,7 +285,8 @@ function App() {
               <p className="no-winners">No winners picked yet.</p>
             )}
 
-            <div className="field">
+            {/* Emphasized winners field */}
+            <div className="field winners-field">
               <label htmlFor="winnersOutput">
                 Winners
                 <span className="tooltip">
