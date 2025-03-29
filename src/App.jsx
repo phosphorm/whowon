@@ -35,7 +35,7 @@ function App() {
       .filter(item => item !== null);
   };
 
-  // Handle "Pick Winners"
+  // "Pick Winners"
   const handleSubmit = (e) => {
     e.preventDefault();
     const entries = parseRawData(rawData);
@@ -63,9 +63,8 @@ function App() {
           seen[entry.name] = entry;
         } else {
           if (duplicateMode === "last") {
-            seen[entry.name] = entry; // keep the later entry
+            seen[entry.name] = entry; // keep later entry
           }
-          // if mode is "first", do nothing
         }
       }
     }
@@ -75,8 +74,8 @@ function App() {
 
     let selectedWinners = [];
 
-    // If Exact Match is toggled, pick only entries whose number == target
     if (exactMatch) {
+      // Pick only entries whose number == target
       selectedWinners = filteredEntries.filter(e => e.number === target);
     } else {
       // Sort by closeness
@@ -112,7 +111,7 @@ function App() {
     setTimestamp(new Date().toLocaleString());
   };
 
-  // Handle "Reset"
+  // "Reset"
   const handleReset = () => {
     setRawData("");
     setWinningNumber("");
@@ -125,14 +124,16 @@ function App() {
     setTimestamp("");
   };
 
-  // Two new preset buttons
+  // Preset "Promo"
   const handlePromoPreset = () => {
-    // Does not reset rawData, just sets the relevant fields
+    // Does not reset rawData
     setNumberOfWinners("2");
     setDuplicateMode("first");
     setTieMode("first");
     setExactMatch(false);
   };
+
+  // Preset "Classic"
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
@@ -140,12 +141,11 @@ function App() {
     setExactMatch(false);
   };
 
-  // Output strings
+  // Build output strings
   const winnersText = winners
     .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
     .join("\n");
   const originalDataText = winners.map(w => w.original).join("\n");
-
   // Round difference to 2 decimals
   const differencesText = winners
     .map(w => {
@@ -154,29 +154,25 @@ function App() {
     })
     .join("\n");
 
-  // The "winners" box only glows if we have at least one winner
+  // The winners box only glows if we have at least one winner
   const winnersBoxClass = `field ${winners.length > 0 ? 'winners-field' : ''}`;
+
+  // iOS style toggle
+  const toggleExactMatch = () => {
+    setExactMatch(!exactMatch);
+  };
 
   return (
     <div className="app">
-      {/* Header (within .app to match width) */}
+      {/* Header (no icon before 'who won?') */}
       <header className="header">
-        {/* Add an icon before the "who won?" text */}
-        <div className="header-left">
-          <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-            help
-          </span>
-          who won?
-        </div>
-        <div className="header-right">
-          {/* Possibly add links or other content here */}
-        </div>
+        <div className="header-left">who won?</div>
+        <div className="header-right"></div>
       </header>
 
       <main className="content">
         {/* Left Panel */}
         <div className="left panel">
-          {/* Icon before the "Inputs" heading */}
           <h1>
             <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
               tune
@@ -210,7 +206,7 @@ function App() {
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
-                    The target number to compare against or match exactly.
+                    The target number to compare or match exactly.
                   </span>
                 </span>
               </label>
@@ -223,33 +219,31 @@ function App() {
               />
             </div>
 
+            {/* Number of Winners + iOS toggle */}
             <div className="field">
               <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
                 <div>
-                  Number of Winners 
+                  Number of Winners
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      How many winners to pick, unless Exact Match is enabled.
+                      How many winners to pick (unless Exact Match is on).
                     </span>
                   </span>
                 </div>
-                {/* Toggle for Exact Match */}
-                <div style={{ marginLeft: "auto" }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: "0.3em" }}>
-                    <span className="tooltip">
-                      <span className="material-icons">info</span>
-                      <span className="tooltiptext">
-                        Enable Exact Match: only pick entries whose number matches exactly.
-                      </span>
+                {/* iOS-like toggle for Exact Match, with info icon on right */}
+                <div className="ios-toggle-container" style={{ marginLeft: "auto" }}>
+                  <div
+                    className={`ios-toggle ${exactMatch ? "checked" : ""}`}
+                    onClick={toggleExactMatch}
+                  />
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      Enable Exact Match: only pick entries whose number matches exactly. 
+                      Duplicate/Tie settings won’t apply.
                     </span>
-                    <input
-                      type="checkbox"
-                      checked={exactMatch}
-                      onChange={(e) => setExactMatch(e.target.checked)}
-                    />
-                    <span>Exact Match</span>
-                  </label>
+                  </span>
                 </div>
               </label>
               <input
@@ -259,7 +253,7 @@ function App() {
                 onChange={(e) => setNumberOfWinners(e.target.value)}
                 placeholder="Enter number of winners"
                 min="1"
-                disabled={exactMatch} /* disable if Exact Match is toggled on */
+                disabled={exactMatch}
               />
             </div>
 
@@ -271,7 +265,7 @@ function App() {
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      If multiple entries are equally close, either pick only the first ones or include all ties.
+                      If multiple entries are equally close, pick only the first N or include all ties.
                     </span>
                   </span>
                 </label>
@@ -279,7 +273,7 @@ function App() {
                   id="tieMode"
                   value={tieMode}
                   onChange={(e) => setTieMode(e.target.value)}
-                  disabled={exactMatch} /* no effect if exact match is on */
+                  disabled={exactMatch}
                 >
                   <option value="all">Include Ties</option>
                   <option value="first">First Answer</option>
@@ -292,7 +286,7 @@ function App() {
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      If the same name appears multiple times, keep only the first occurrence or the last occurrence.
+                      If the same name appears multiple times, keep only the first or last occurrence.
                     </span>
                   </span>
                 </label>
@@ -300,6 +294,7 @@ function App() {
                   id="duplicateMode"
                   value={duplicateMode}
                   onChange={(e) => setDuplicateMode(e.target.value)}
+                  disabled={exactMatch}
                 >
                   <option value="first">Keep First</option>
                   <option value="last">Keep Last</option>
@@ -313,7 +308,7 @@ function App() {
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
-                    Comma-separated names that should never be filtered out as duplicates.
+                    Comma-separated names that should not be filtered out as duplicates.
                   </span>
                 </span>
               </label>
@@ -340,13 +335,6 @@ function App() {
 
         {/* Right Panel */}
         <div className="right panel">
-          {/* Reset button in top-right of the right panel */}
-          <button className="secondary-btn reset-right" onClick={handleReset}>
-            <span className="material-icons">refresh</span>
-            Reset
-          </button>
-
-          {/* Icon before "Results" */}
           <h1 style={{ marginTop: 0 }}>
             <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
               list_alt
@@ -354,16 +342,25 @@ function App() {
             Results
           </h1>
 
-          {/* Two new preset buttons under the Results heading */}
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-            <button className="secondary-btn" onClick={handlePromoPreset}>
-              <span className="material-icons">local_offer</span>
-              Promo
-            </button>
-            <button className="secondary-btn" onClick={handleClassicPreset}>
-              <span className="material-icons">history</span>
-              Classic
-            </button>
+          {/* Preset Buttons and Reset Icon aligned in one row */}
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+            {/* "Promo" & "Classic" on left */}
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button className="secondary-btn" onClick={handlePromoPreset}>
+                <span className="material-icons">local_offer</span>
+                Promo
+              </button>
+              <button className="secondary-btn" onClick={handleClassicPreset}>
+                <span className="material-icons">history</span>
+                Classic
+              </button>
+            </div>
+            {/* Reset icon on the right */}
+            <div style={{ marginLeft: "auto" }}>
+              <button className="secondary-btn reset-button" onClick={handleReset}>
+                <span className="material-icons">refresh</span>
+              </button>
+            </div>
           </div>
 
           <div className="results">
@@ -379,7 +376,7 @@ function App() {
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
-                    The exact lines from the raw data corresponding to each winner.
+                    The original lines from the raw data that correspond to each winner.
                   </span>
                 </span>
               </label>
@@ -398,7 +395,7 @@ function App() {
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
-                    The difference between the winner’s guess and the winning number, rounded to 2 decimals.
+                    The difference between each winner’s guess and the winning number, rounded to 2 decimals.
                   </span>
                 </span>
               </label>
@@ -411,14 +408,13 @@ function App() {
               />
             </div>
 
-            {/* Winners field placed last, only glows if there are winners */}
             <div className={winnersBoxClass}>
               <label htmlFor="winnersOutput">
                 Winners
                 <span className="tooltip">
                   <span className="material-icons">info</span>
                   <span className="tooltiptext">
-                    The list of winners, in the format ":W: Name - number :W:".
+                    List of winners in the format ":W: Name - number :W:".
                   </span>
                 </span>
               </label>
