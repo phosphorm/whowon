@@ -5,9 +5,10 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: #0d0d0d;              /* nearly black background */
-  color: #f0f0f0;                        /* off-white text for high contrast */
-  font-family: 'Inter', sans-serif;      /* use Inter font for all text */
+  /* Removed the gray background color to reveal the actual gradient:
+     background-color: #0d0d0d; */
+  color: #f0f0f0;
+  font-family: 'Inter', sans-serif;
 }
 
 /* App container with max width for readability */
@@ -46,19 +47,17 @@ html, body {
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);  /* subtle shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
   z-index: 10;
 }
 .header .header-left {
   font-size: 1.2rem;
   font-weight: 600;
-  /* Could insert a logo image here with max-height if needed */
 }
 .header .header-right {
   font-size: 0.95rem;
   color: #aaa;
 }
-/* Optional: style header-right as navigation if links are added */
 .header .header-right a {
   color: #aaa;
   text-decoration: none;
@@ -81,9 +80,8 @@ html, body {
   flex: 1 1 0;
   min-width: 280px;
 }
-/* Left panel a bit wider if space allows */
 .left {
-  flex: 2 1 0;
+  flex: 2 1 0; /* Left panel a bit wider */
 }
 
 /* Panels for input and output sections */
@@ -91,7 +89,7 @@ html, body {
   background: #1a1a1a;  /* slightly lighter dark for contrast against body */
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);  /* soft shadow around panels */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 /* Headings */
@@ -112,7 +110,6 @@ h2 {
 .field {
   margin-bottom: 1.2rem;
 }
-/* Make label and optional icon/tooltip span full width */
 .field label {
   display: flex;
   justify-content: space-between;
@@ -121,12 +118,12 @@ h2 {
   font-size: 0.95em;
   margin-bottom: 0.3em;
 }
-/* Style the info icon within labels */
 .field .material-icons {
-  font-size: 18px;          /* slightly smaller than default 24px */
-  color: #888;              /* grey icon so it's subtle */
+  font-size: 18px;
+  color: #888;
   cursor: help;
 }
+
 /* Tooltip container (wraps icon and tooltip text) */
 .tooltip {
   position: relative;
@@ -151,7 +148,6 @@ h2 {
   line-height: 1.4em;
   transition: opacity 0.2s;
 }
-/* Show tooltip on hover */
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
@@ -161,7 +157,7 @@ h2 {
 input, textarea, select {
   width: 100%;
   background-color: #262626;
-  border: none;               /* no border (no outline) */
+  border: none;
   color: #f0f0f0;
   border-radius: 6px;
   padding: 0.5em 0.8em;
@@ -169,15 +165,12 @@ input, textarea, select {
   box-sizing: border-box;
   transition: box-shadow 0.3s, background-color 0.3s;
 }
-/* Placeholder text in inputs */
 input::placeholder, textarea::placeholder {
   color: #777;
 }
-/* Textareas can expand vertically */
 textarea {
   resize: vertical;
 }
-/* Focus state: glow outline with accent color */
 input:focus, textarea:focus, select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.5);
@@ -194,19 +187,17 @@ button {
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
-/* Primary action button (Pick Winners) */
 .primary-btn {
-  background-color: #008800; /* dark green base for contrast */
+  background-color: #008800;
   color: #ffffff;
 }
 .primary-btn:hover {
   background-color: #00aa00;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6); /* green glow */
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
 }
 .primary-btn:active {
   background-color: #007500;
 }
-/* Secondary button (Reset) */
 .secondary-btn {
   background-color: #444444;
   color: #ffffff;
@@ -222,20 +213,14 @@ button {
 
 /* Results/output styling */
 .results {
-  /* This container inherits .panel styles via class "panel" */
+  /* inherits .panel styles via class "panel" */
 }
-.results label {
-  /* Using same label styles as inputs */
-}
-.results textarea {
-  /* Same base styles as inputs (already applied), plus make read-only fields appear disabled if no data */
-}
+.results label { /* same label styles as inputs */ }
+.results textarea {}
 .no-winners {
   color: #888;
   font-style: italic;
 }
-
-/* Ensure lists inside results (if any) are styled properly */
 .results ul {
   list-style: none;
   padding-left: 1.2em;

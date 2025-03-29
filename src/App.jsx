@@ -117,8 +117,18 @@ function App() {
   };
 
   // Prepare output text for winners and their original data
-  const winnersText = winners.map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`).join("\n");
+  const winnersText = winners
+    .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
+    .join("\n");
   const originalDataText = winners.map(w => w.original).join("\n");
+
+  // Prepare output for name + difference
+  const differencesText = winners
+    .map(w => {
+      const diff = Math.abs(w.number - parseFloat(winningNumber));
+      return `Name: ${w.name || "No Name"}, Difference: ${diff}`;
+    })
+    .join("\n");
 
   return (
     <div className="app">
@@ -127,7 +137,6 @@ function App() {
         <div className="header-left">Closest Number Picker</div>
         <div className="header-right">
           {/* Placeholder for navigation or info on the right side */}
-          {/* For example, could be a link: <a href="#help">Help</a> */}
         </div>
       </header>
 
@@ -195,9 +204,9 @@ function App() {
               />
             </div>
 
-            {/* Tie Mode Options */}
+            {/* Tie Mode: Now a dropdown */}
             <div className="field">
-              <label>
+              <label htmlFor="tieMode">
                 Tie Handling 
                 <span className="tooltip">
                   <span className="material-icons">info</span>
@@ -206,33 +215,19 @@ function App() {
                   </span>
                 </span>
               </label>
-              <div style={{ paddingLeft: "1.2em", marginTop: "0.3em" }}>
-                <label style={{ marginRight: "1.5em" }}>
-                  <input
-                    type="radio"
-                    name="tieMode"
-                    value="first"
-                    checked={tieMode === "first"}
-                    onChange={(e) => setTieMode(e.target.value)}
-                  />
-                  <span style={{ marginLeft: "0.3em" }}>First N Only</span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="tieMode"
-                    value="all"
-                    checked={tieMode === "all"}
-                    onChange={(e) => setTieMode(e.target.value)}
-                  />
-                  <span style={{ marginLeft: "0.3em" }}>Include All Ties</span>
-                </label>
-              </div>
+              <select
+                id="tieMode"
+                value={tieMode}
+                onChange={(e) => setTieMode(e.target.value)}
+              >
+                <option value="first">First N Only</option>
+                <option value="all">Include All Ties</option>
+              </select>
             </div>
 
-            {/* Duplicate Handling Options */}
+            {/* Duplicate Handling: Now a dropdown */}
             <div className="field">
-              <label>
+              <label htmlFor="duplicateMode">
                 Duplicate Handling 
                 <span className="tooltip">
                   <span className="material-icons">info</span>
@@ -241,28 +236,14 @@ function App() {
                   </span>
                 </span>
               </label>
-              <div style={{ paddingLeft: "1.2em", marginTop: "0.3em" }}>
-                <label style={{ marginRight: "1.5em" }}>
-                  <input
-                    type="radio"
-                    name="duplicateMode"
-                    value="first"
-                    checked={duplicateMode === "first"}
-                    onChange={(e) => setDuplicateMode(e.target.value)}
-                  />
-                  <span style={{ marginLeft: "0.3em" }}>Keep First</span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="duplicateMode"
-                    value="last"
-                    checked={duplicateMode === "last"}
-                    onChange={(e) => setDuplicateMode(e.target.value)}
-                  />
-                  <span style={{ marginLeft: "0.3em" }}>Keep Last</span>
-                </label>
-              </div>
+              <select
+                id="duplicateMode"
+                value={duplicateMode}
+                onChange={(e) => setDuplicateMode(e.target.value)}
+              >
+                <option value="first">Keep First</option>
+                <option value="last">Keep Last</option>
+              </select>
             </div>
 
             <div className="field">
@@ -294,12 +275,12 @@ function App() {
         <div className="right panel">
           <h1>Results</h1>
           <div className="results">
-            {/* Timestamp and outputs */}
             {timestamp ? (
               <p><strong>Timestamp:</strong> {timestamp}</p>
             ) : (
               <p className="no-winners">No winners picked yet.</p>
             )}
+
             <div className="field">
               <label htmlFor="winnersOutput">
                 Winners Output 
@@ -318,6 +299,7 @@ function App() {
                 placeholder="No winners to display yet..."
               />
             </div>
+
             <div className="field">
               <label htmlFor="originalOutput">
                 Original Data for Winners 
@@ -334,6 +316,20 @@ function App() {
                 readOnly
                 value={originalDataText}
                 placeholder="Original entries of winners will appear here..."
+              />
+            </div>
+
+            {/* New output showing each winner's name & difference to target */}
+            <div className="field">
+              <label htmlFor="differencesOutput">
+                Name &amp; Difference from Winning Number
+              </label>
+              <textarea
+                id="differencesOutput"
+                rows="5"
+                readOnly
+                value={differencesText}
+                placeholder="No differences to display yet..."
               />
             </div>
           </div>
