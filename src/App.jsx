@@ -52,6 +52,7 @@ function App() {
       .map((line, index) => ({ line: line.trim(), index }))
       .filter(item => item.line.length > 0)
       .map(({ line, index }) => {
+        // extract first number pattern
         const match = line.match(/([-+]?[0-9]*[.,]?[0-9]+)/);
         if (match) {
           const numberValue = parseFloat(match[0].replace(",", "."));
@@ -95,7 +96,7 @@ function App() {
       .map(name => name.trim())
       .filter(name => name !== "");
 
-    // Filter duplicates
+    // Filter duplicates 
     const filteredEntries = [];
     const seen = {};
     for (const entry of entries) {
@@ -117,10 +118,11 @@ function App() {
 
     let selectedWinners = [];
     if (exactMatch) {
+      // only those that exactly match the number
       const t = parseFloat(winningNumber);
       selectedWinners = filteredEntries.filter(e => e.number === t);
     } else {
-      // Sort by closeness
+      // sort by closeness
       const sortedEntries = filteredEntries.sort((a, b) => {
         const diffA = Math.abs(a.number - target);
         const diffB = Math.abs(b.number - target);
@@ -129,7 +131,6 @@ function App() {
         }
         return diffA - diffB;
       });
-
       const wCount = parseInt(numberOfWinners, 10);
       if (tieMode === "first") {
         selectedWinners = sortedEntries.slice(0, wCount);
@@ -380,22 +381,22 @@ function App() {
                 />
               </div>
 
-              {/* "Pick Winners" button fills the width */}
+              {/* "Pick Winners" button with animated gradient */}
               <button
                 type="submit"
                 className="primary-btn pick-winners-wide"
-                style={{ marginTop: "auto" }}
               >
-                <span className="material-icons">done_all</span>
+                <span className="material-icons" style={{ fontSize: "1.2rem" }}>done_all</span>
                 Pick Winners
               </button>
             </form>
           </div>
 
-          {/* Right Column: Two stacked panels: Presets & Results */}
+          {/* Right Column: Two stacked panels with .presets-block and .results-block
+              We'll reorder them on mobile so .results-block is first. */}
           <div className="right" style={{ flexDirection: "column" }}>
             {/* Presets Panel */}
-            <div className="panel">
+            <div className="panel presets-block">
               <h2 className="section-title">
                 <span className="material-icons">widgets</span>
                 Presets
@@ -433,7 +434,7 @@ function App() {
             </div>
 
             {/* Results Panel */}
-            <div className="panel">
+            <div className="panel results-block">
               {/* Results heading + Message Filter toggle in same line */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.3rem" }}>
                 {/* Left side: heading with icon */}
@@ -441,19 +442,18 @@ function App() {
                   <span className="material-icons">list_alt</span>
                   Results
                 </h2>
-                {/* Right side: iOS toggle for 'Message Filter' + info icon */}
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.3em", marginBottom: "0.2rem" }}>
+                {/* Right side: label & info icon to left of toggle */}
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                  <div className="tooltip" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
                     <span style={{ fontSize: "0.9em" }}>Message Filter</span>
-                    <span className="tooltip">
-                      <span className="material-icons">info</span>
-                      <span className="tooltiptext">
-                        When enabled, the second word in each winner’s name is shortened 
-                        by removing digits/currency, e.g. "Ben Bowej98" -&gt; "Ben B". 
-                        Original messages are always unchanged.
-                      </span>
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      When enabled, the second word in each winner’s name is shortened 
+                      by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98". 
+                      Original messages are always unchanged.
                     </span>
                   </div>
+
                   <div className="ios-toggle-container">
                     <div
                       className={`ios-toggle ${filterNames ? "checked" : ""}`}

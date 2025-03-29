@@ -124,12 +124,32 @@ html, body {
   Matches the size of the Presets one => 1.2em.
 */
 .section-title {
-  font-size: 1.2em;  /* consistent for all headings */
-  margin: 0 0 0.8rem 0;  /* top is 0, bottom is 0.8rem */
+  font-size: 1.2em;  
+  margin: 0 0 0.8rem 0;
   font-weight: 700;
   display: flex;
-  align-items: center; /* so icon & text line up */
-  gap: 0.4em;         /* small space between icon & text */
+  align-items: center; 
+  gap: 0.4em;
+}
+
+/* 
+  We'll reorder the .presets-block and .results-block on mobile. 
+  On Desktop: .presets-block -> order: 0, .results-block -> order: 1
+  On Mobile:  .results-block -> order: 0, .presets-block -> order: 1
+*/
+.presets-block {
+  order: 0;
+}
+.results-block {
+  order: 1;
+}
+@media (max-width: 600px) {
+  .presets-block {
+    order: 1;
+  }
+  .results-block {
+    order: 0;
+  }
 }
 
 /* Form fields */
@@ -138,7 +158,7 @@ html, body {
 }
 .field label {
   display: flex;
-  justify-content: flex-start; /* left alignment */
+  justify-content: flex-start;
   align-items: center;
   font-weight: 500;
   font-size: 0.95em;
@@ -217,30 +237,28 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.5);
 }
 
-/* Buttons: slightly smaller */
-button {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9em;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4em 0.6em; 
-  cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3em;
+/* 
+  The "Pick Winners" button is now taller, with bigger font & 
+  an animated gradient background. We'll center everything inside it. 
+*/
+.pick-winners-wide {
+  width: 100%;
+  min-height: 3rem;         /* taller button */
+  font-size: 1rem;          /* bigger text */
+  justify-content: center;  /* center items horizontally */
+  align-items: center; 
+  background: linear-gradient(45deg, #008800, #00cc00, #008800);
+  background-size: 200% 200%;
+  animation: pickWinnersAnim 4s ease-in-out infinite alternate; /* subtle shift */
 }
-.primary-btn {
-  background-color: #008800;
-  color: #ffffff;
-}
-.primary-btn:hover {
-  background-color: #00aa00;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
-}
-.primary-btn:active {
-  background-color: #007500;
+
+@keyframes pickWinnersAnim {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Muted red for reset button */
@@ -272,11 +290,6 @@ button {
   background-color: #3a3a3a;
 }
 
-/* The "Pick Winners" button remains full width on the left panel */
-.pick-winners-wide {
-  width: 100%;
-}
-
 /* Results / output styling */
 .results {
   display: flex;
@@ -303,18 +316,25 @@ button {
   margin-bottom: 0.3em;
 }
 
-/* winners-field glows if winners exist */
+/* 
+   Winners field glows if there are winners. 
+   We'll add an animated glow around the box that pulses.
+*/
 .winners-field {
-  border: 2px solid #00ff00;
   border-radius: 8px;
-  padding: 0.8rem; 
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
   margin-bottom: 1rem;
+  padding: 0.8rem; 
+  animation: winnersGlow 2s infinite alternate; 
+  /* We'll override the box-shadow in the animation */
 }
-.winners-field label {
-  font-size: 1.05em;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+
+@keyframes winnersGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0,255,0,0.7);
+  }
 }
 
 /* iOS-like toggle styling for toggles */
@@ -357,12 +377,11 @@ button {
   pointer-events: none;
 }
 
-/* 
-  Smaller, less prominent timestamp 
-  Also reduce top margin to reduce space between heading & timestamp 
+/* Smaller, less prominent timestamp
+   Additional space below it for the first box 
 */
 .timestamp {
   font-size: 0.85em;
   color: #bbb;
-  margin: 0.3rem 0 0.5rem 0; 
+  margin: 0.3rem 0 0.6rem 0; /* slight margin below */
 }
