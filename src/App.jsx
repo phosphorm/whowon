@@ -398,7 +398,7 @@ function App() {
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
                       When enabled, second word in each winner’s name is shortened
-                      by removing digits/currency, e.g. "Ben Bowej98" -> "Ben B".
+                      by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98".
                       Original messages remain unchanged.
                     </span>
                   </div>

@@ -116,16 +116,18 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 1rem; /* default spacing to next panel */
+  margin-bottom: 1rem; /* default spacing below each panel */
 }
 
 /* 
-  "Presets" block specifically
-  We'll keep standard margin-bottom for spacing to the next panel 
-  but remove extra bottom padding inside if needed
+  "Presets" block: Remove extra bottom space *inside* the panel,
+  but keep the panel's margin-bottom for spacing to the next panel.
 */
 .presets-block {
-  margin-bottom: 0; /* no additional margin beyond .panel's default */
+  /* We'll remove bottom margin/padding from the panel's *content*, not from the panel itself. */
+}
+.presets-block > *:last-child {
+  margin-bottom: 0 !important; /* remove extra bottom margin from the last child row if any */
 }
 
 /* 
@@ -140,10 +142,7 @@ html, body {
   gap: 0.4em;
 }
 
-/* Reorder the .presets-block and .results-block on mobile. 
-   On Desktop: .presets-block -> order: 0, .results-block -> order: 1
-   On Mobile:  .results-block -> order: 0, .presets-block -> order: 1
-*/
+/* Reorder .presets-block & .results-block on mobile */
 .results-block {
   order: 1;
 }
@@ -349,17 +348,13 @@ button {
   font-style: italic;
 }
 
-/* Deprioritized fields */
+/* 
+  Instead of partial opacity, we use a more muted color for 
+  "Original Messages" and "Name(s) & Difference" sections
+*/
 .deprioritized {
-  opacity: 0.7;
+  color: #aaa;        /* more subdued color */
   font-size: 0.9em;
-}
-.results ul {
-  list-style: none;
-  padding-left: 1.2em;
-}
-.results li {
-  margin-bottom: 0.3em;
 }
 
 /* 
