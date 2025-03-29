@@ -116,34 +116,33 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem; /* default spacing to next panel */
 }
 
 /* 
-  "Presets" block specifically – remove extra bottom space:
-  set margin-bottom to 0 if it's the last panel. 
+  "Presets" block specifically
+  We'll keep standard margin-bottom for spacing to the next panel 
+  but remove extra bottom padding inside if needed
 */
 .presets-block {
-  margin-bottom: 0; /* remove unnecessary empty space at bottom */
+  margin-bottom: 0; /* no additional margin beyond .panel's default */
 }
 
 /* 
   Unified heading style for all sections (Inputs, Presets, Results).
-  1.2em, matching the old "Presets" heading size.
 */
 .section-title {
-  font-size: 1.2em;  
+  font-size: 1.2em;
   margin: 0 0 0.8rem 0;
   font-weight: 700;
   display: flex;
-  align-items: center; 
+  align-items: center;
   gap: 0.4em;
 }
 
-/* 
-  We'll reorder the .presets-block and .results-block on mobile. 
-  On Desktop: .presets-block -> order: 0, .results-block -> order: 1
-  On Mobile:  .results-block -> order: 0, .presets-block -> order: 1
+/* Reorder the .presets-block and .results-block on mobile. 
+   On Desktop: .presets-block -> order: 0, .results-block -> order: 1
+   On Mobile:  .results-block -> order: 0, .presets-block -> order: 1
 */
 .results-block {
   order: 1;
@@ -175,10 +174,8 @@ html, body {
   cursor: help;
 }
 
-/* Slight space between label text and info icon for headings. 
-   We'll replicate the approach from "Number of Winners." 
-   This class can be used for any heading with an info icon.
-*/
+/* Slight space between heading text and info icon for headings. 
+   This class can be used on the label or heading with an icon. */
 .label-with-icon {
   display: inline-flex;
   align-items: center;
@@ -201,7 +198,7 @@ html, body {
 }
 .tooltip .tooltiptext {
   visibility: hidden;
-  opacity: 1; /* no transparency for these tooltips, for better readability */
+  opacity: 1; /* no transparency for better readability */
   background-color: #333;
   color: #fff;
   text-align: left;
@@ -367,7 +364,6 @@ button {
 
 /* 
   Smooth ring-style glow around the winners field (if winners exist).
-  We do this with a pseudo-element that runs around the perimeter. 
 */
 .winners-field {
   position: relative;

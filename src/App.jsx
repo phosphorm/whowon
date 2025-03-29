@@ -196,7 +196,6 @@ function App() {
         </header>
 
         <main className="content">
-          {/* Left Panel */}
           <div className="left panel">
             <h2 className="section-title">
               <span className="material-icons">tune</span>
@@ -243,7 +242,7 @@ function App() {
               <div className="field" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                 <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
                   <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
-                    <div className="num-winners-label label-with-icon">
+                    <div className="label-with-icon">
                       Number of Winners
                       <span className="tooltip">
                         <span className="material-icons">info</span>
@@ -350,7 +349,6 @@ function App() {
             </form>
           </div>
 
-          {/* Right Column: .presets-block & .results-block, reorder on mobile */}
           <div className="right" style={{ flexDirection: "column" }}>
             <div className="panel presets-block">
               <h2 className="section-title">
@@ -394,14 +392,13 @@ function App() {
                   Results
                 </h2>
 
-                {/* Message Filter text/icon on left side of toggle */}
                 <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
                   <div className="tooltip label-with-icon" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
                     <span style={{ fontSize: "0.9em" }}>Message Filter</span>
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
                       When enabled, second word in each winner’s name is shortened
-                      by removing digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98".
+                      by removing digits/currency, e.g. "Ben Bowej98" -> "Ben B".
                       Original messages remain unchanged.
                     </span>
                   </div>
@@ -427,7 +424,7 @@ function App() {
                 <div className="field deprioritized">
                   <label htmlFor="originalOutput" className="label-with-icon">
                     Original Messages
-                    <span className="tooltip no-transparency">
+                    <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
                         The original lines from the raw data that correspond to each winner.
@@ -447,7 +444,7 @@ function App() {
                 <div className="field deprioritized">
                   <label htmlFor="differencesOutput" className="label-with-icon">
                     Name(s) &amp; Difference
-                    <span className="tooltip no-transparency">
+                    <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
                         Winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
