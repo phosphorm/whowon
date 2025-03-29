@@ -1,79 +1,122 @@
-/* Global dark theme with neon accent background */
-body {
-  background-color: #121212;  /* fallback solid color */
-  background: linear-gradient(to bottom, #39ff14 0%, #121212 100%);
-  color: #eee;
-  font-family: sans-serif;
+/* Global base styles with dark theme and neon accent background */
+html, body {
   margin: 0;
-  min-height: 100vh;  /* ensure gradient covers full viewport */
+  padding: 0;
+  min-height: 100vh;
 }
-
-.app {
+body {
+  /* Neon green to dark gradient background */
+  background: linear-gradient(to bottom, #121212 0%, #121212 60%, #39ff14 100%);
+  color: #eee;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+/* Container styling */
+.App {
   max-width: 900px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem 1rem;
 }
-
-/* Headings styling */
+/* Headings */
 h1 {
   font-size: 2em;
-  margin-bottom: 0.5em;
-  font-weight: 700;
-  color: #39ff14;  /* neon green text for header */
-  text-shadow: 0 0 2px #000, 0 0 5px #39ff14, 0 0 10px #39ff14;
-  animation: neonGlow 3s infinite alternate ease-in-out;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 h2 {
   font-size: 1.3em;
-  margin-bottom: 0.5em;
   font-weight: 600;
+  margin-bottom: 0.5em;
 }
-
-/* Layout: two-column responsive container */
-.content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  align-items: flex-start;
-}
-.left, .right {
-  flex: 1 1 0;
-  min-width: 280px;
-}
-.left {
-  flex: 2 1 0;
-}
-
-/* Form field grouping */
+/* Form field grouping and labels */
 .field {
   margin-bottom: 1rem;
 }
-.inline-fields {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-.inline-fields .field {
-  margin-bottom: 0;
-}
-
-/* Labels and tooltips */
 .field label {
   display: block;
   font-weight: 600;
   font-size: 0.95em;
   margin-bottom: 0.3em;
 }
+/* Input, textarea, select elements */
+input, textarea, select {
+  width: 100%;
+  background-color: #2c2c2c;
+  border: 1px solid #555;
+  color: #eee;
+  border-radius: 6px;
+  padding: 0.5em;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input::placeholder, textarea::placeholder {
+  color: #888;
+}
+textarea {
+  resize: vertical;
+}
+/* Focus state for inputs and select */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #39ff14;
+  box-shadow: 0 0 5px #39ff14;
+}
+/* Button styles */
+.primary-btn {
+  background-color: #39ff14;
+  color: #000;
+  font-weight: 700;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  /* Neon glow effect around button */
+  box-shadow: 0 0 8px #39ff14;
+  animation: pulseGlow 2s infinite alternate;
+  transition: transform 0.2s;
+}
+.primary-btn:hover {
+  transform: scale(1.05);
+}
+.primary-btn:focus {
+  outline: none;
+  box-shadow: 0 0 12px #39ff14;
+}
+.primary-btn:active {
+  transform: scale(0.97);
+}
+.secondary-btn {
+  background-color: #555;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-left: 0.5rem;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.secondary-btn:hover {
+  background-color: #666;
+  transform: scale(1.03);
+}
+.secondary-btn:focus {
+  outline: none;
+  box-shadow: 0 0 5px #39ff14;
+}
+.secondary-btn:active {
+  transform: scale(0.97);
+}
+/* Tooltip (for any info icons or hints) */
 .tooltip {
   position: relative;
   display: inline-block;
   cursor: help;
   margin-left: 0.3em;
   color: #ccc;
-}
-.tooltip:hover {
-  color: #39ff14;  /* highlight info icon on hover */
 }
 .tooltip .tooltiptext {
   visibility: hidden;
@@ -85,116 +128,56 @@ h2 {
   border-radius: 6px;
   position: absolute;
   z-index: 10;
-  bottom: 125%; /* positioned above the info icon */
+  bottom: 125%;
   left: 50%;
-  transform: translate(-50%, 10%);  /* slight offset for animation */
+  transform: translateX(-50%);
   max-width: 220px;
   font-size: 0.85em;
   line-height: 1.2em;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.2s;
 }
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
-  transform: translate(-50%, 0);
 }
-
-/* Form inputs and select elements */
-input, textarea, select {
+/* Results section styling */
+.results {
+  background-color: rgba(30, 30, 30, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 2rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+.results h2 {
+  margin-top: 0;
+}
+.results p {
+  margin-bottom: 0.5rem;
+}
+.results label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95em;
+  margin-top: 0.5rem;
+  margin-bottom: 0.3em;
+}
+.results textarea {
   width: 100%;
   background-color: #2c2c2c;
   border: 1px solid #555;
   color: #eee;
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 0.5em;
   font-size: 1em;
-  box-sizing: border-box;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);  /* subtle shadow for depth */
+  margin-bottom: 0.5rem;
 }
-input::placeholder, textarea::placeholder {
-  color: #888;
-}
-textarea {
-  resize: vertical;
-}
-
-/* Input focus state for accessibility */
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #39ff14;
-  box-shadow: 0 0 5px rgba(57, 255, 20, 0.7);
-}
-
-/* Button styling */
-.calculate-btn {
-  background-color: #39ff14;
-  color: #000;  /* black text for contrast on neon background */
-  font-weight: 600;
-  padding: 0.6em 1.2em;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1em;
-  position: relative;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  animation: pulseBtn 2.5s infinite alternate ease-in-out;
-}
-.calculate-btn:hover {
-  background-color: #33e612;  /* slightly darken on hover */
-  transform: scale(1.05);
-}
-.calculate-btn:focus {
-  outline: 2px solid #fff;  /* white focus ring for visibility */
-  outline-offset: 2px;
-}
-
-/* Winners output box styling */
-.output-box {
-  background-color: #1e1e1e;
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 1rem;
-  box-shadow: none;
-  animation: pulseBox 4s infinite alternate ease-in-out;
-}
-.output-box h2 {
-  margin-top: 0;
-}
-.output-box ul {
-  list-style: none;
-  margin: 0;
-  padding-left: 1em;
-}
-.output-box li {
-  margin-bottom: 0.5em;
-}
-.no-winners {
-  color: #aaa;
-  font-style: italic;
-}
-
-/* Keyframe animations for glowing effects */
-@keyframes neonGlow {
-  from {
-    text-shadow: 0 0 2px #000, 0 0 5px #39ff14, 0 0 10px #39ff14;
+/* Neon pulsing glow animation for accent elements */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px #39ff14, 0 0 12px #39ff14;
   }
-  to {
-    text-shadow: 0 0 2px #000, 0 0 10px #39ff14, 0 0 20px #39ff14;
-  }
-}
-@keyframes pulseBtn {
-  from {
-    box-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
-  }
-  to {
-    box-shadow: 0 0 16px rgba(57, 255, 20, 0.7);
-  }
-}
-@keyframes pulseBox {
-  from {
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
-  }
-  to {
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+  50% {
+    box-shadow: 0 0 20px #39ff14, 0 0 30px #39ff14;
   }
 }
