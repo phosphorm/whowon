@@ -22,7 +22,7 @@ button {
   cursor: pointer;
 }
 
-.tie-mode {
+.tie-mode, .duplicate-mode, .whitelist {
   margin-bottom: 15px;
   background-color: #f0f0f0;
   padding: 10px;
