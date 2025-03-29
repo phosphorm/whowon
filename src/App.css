@@ -286,7 +286,7 @@ button {
   margin-bottom: 0.5rem;
 }
 
-/* iOS-like toggle styling for Exact Match */
+/* iOS-like toggle styling for toggles */
 .ios-toggle-container {
   display: inline-flex;
   align-items: center;

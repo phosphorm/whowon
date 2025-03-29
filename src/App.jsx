@@ -1,6 +1,31 @@
 import React, { useState } from "react";
 import "./App.css";
 
+/**
+ * Attempt to transform the name if the 'Message Filter' is on.
+ * Implementation:
+ *  - Keep the entire first "word" as is (including hyphens, etc).
+ *  - For the second "word," keep only its first letter if it’s alphabetic, ignoring trailing digits/currency chars.
+ *  - If there's no second word or no leading letter, omit it altogether.
+ */
+function transformName(originalName) {
+  const words = originalName.trim().split(/\s+/);
+  if (words.length === 0) return originalName;
+
+  const firstChunk = words[0]; // keep as is
+  let secondChunk = words[1] || "";
+
+  // remove non-alpha from second chunk, keep only letters
+  const alphaOnly = secondChunk.replace(/[^a-zA-Z]/g, "");
+  let secondLetter = alphaOnly.length > 0 ? alphaOnly[0] : "";
+
+  let finalName = firstChunk;
+  if (secondLetter) {
+    finalName += " " + secondLetter;
+  }
+  return finalName;
+}
+
 function App() {
   // Fields
   const [rawData, setRawData] = useState("");
@@ -15,12 +40,14 @@ function App() {
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
 
-  // Inline error states
+  // Error states
   const [rawDataError, setRawDataError] = useState("");
   const [winningNumberError, setWinningNumberError] = useState("");
   const [numberOfWinnersError, setNumberOfWinnersError] = useState("");
 
-  // Parse raw data lines
+  // NEW: "Message Filter" toggle
+  const [filterNames, setFilterNames] = useState(true); // default ON
+
   const parseRawData = (data) => {
     return data
       .split("\n")
@@ -38,7 +65,6 @@ function App() {
       .filter(item => item !== null);
   };
 
-  // Clear all error messages
   const clearErrors = () => {
     setRawDataError("");
     setWinningNumberError("");
@@ -71,9 +97,8 @@ function App() {
       }
     }
 
-    if (hasError) return; // don't proceed if any field is invalid
+    if (hasError) return; // don't proceed if invalid input
 
-    // Parse data
     const entries = parseRawData(rawData);
 
     // Whitelist array
@@ -82,7 +107,7 @@ function App() {
       .map(name => name.trim())
       .filter(name => name !== "");
 
-    // Filter duplicates (except whitelisted)
+    // Filter duplicates
     const filteredEntries = [];
     const seen = {};
     for (const entry of entries) {
@@ -103,9 +128,7 @@ function App() {
     }
 
     let selectedWinners = [];
-
     if (exactMatch) {
-      // Only entries whose number == target
       selectedWinners = filteredEntries.filter(e => e.number === target);
     } else {
       // Sort by closeness
@@ -155,15 +178,13 @@ function App() {
     clearErrors();
   };
 
-  // Preset "Promo"
+  // Presets
   const handlePromoPreset = () => {
     setNumberOfWinners("2");
     setDuplicateMode("first");
     setTieMode("first");
     setExactMatch(false);
   };
-
-  // Preset "Classic"
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
@@ -171,27 +192,36 @@ function App() {
     setExactMatch(false);
   };
 
+  // Message Filter logic
+  const toggleFilterNames = () => {
+    setFilterNames(!filterNames);
+  };
+
   // Build output strings
+  // Winners text
   const winnersText = winners
-    .map(w => `:W: ${w.name || "No Name"} - ${w.number} :W:`)
+    .map(w => {
+      const dispName = filterNames ? transformName(w.name) : (w.name || "No Name");
+      return `:W: ${dispName} - ${w.number} :W:`;
+    })
     .join("\n");
+
+  // Original messages are always the entire line
   const originalDataText = winners.map(w => w.original).join("\n");
+
+  // Name(s) & difference, rounding to 2 decimals, applying filter if enabled
   const differencesText = winners
     .map(w => {
       const diff = Math.abs(w.number - parseFloat(winningNumber)).toFixed(2);
-      return `Name: ${w.name || "No Name"}, Difference: ${diff}`;
+      const dispName = filterNames ? transformName(w.name) : (w.name || "No Name");
+      return `Name: ${dispName}, Difference: ${diff}`;
     })
     .join("\n");
 
   // The winners box only glows if we have at least one winner
-  const winnersBoxClass = `field ${winners.length > 0 ? 'winners-field' : ''}`;
+  const winnersBoxClass = `field ${winners.length > 0 ? "winners-field" : ""}`;
 
-  // iOS style toggle
-  const toggleExactMatch = () => {
-    setExactMatch(!exactMatch);
-  };
-
-  // If exactMatch is on, tie & duplicate are disabled & visually grayed out
+  // tie/duplicate fields disabled if exactMatch is on
   const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
 
   return (
@@ -199,7 +229,7 @@ function App() {
       {/* Header */}
       <header className="header">
         <div className="header-left">who won?</div>
-        <div className="header-right"></div>
+        <div className="header-right" />
       </header>
 
       <main className="content">
@@ -255,9 +285,9 @@ function App() {
               {winningNumberError && <div className="field-error">{winningNumberError}</div>}
             </div>
 
-            {/* Number of Winners & Exact Match Toggle in same row, but separate containers */}
+            {/* Number of Winners & Exact Match Toggle side by side */}
             <div className="field" style={{ display: "flex", gap: "1rem" }}>
-              {/* Number of Winners container -> can be grayed out if exactMatch is on */}
+              {/* Number of Winners block, can be grayed if exactMatch is on */}
               <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
                 <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
                   <div>
@@ -282,7 +312,7 @@ function App() {
                 {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
               </div>
 
-              {/* The toggle remains active even if exactMatch is on */}
+              {/* Exact Match toggle remains active even if exactMatch is on */}
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
                 <label style={{ marginBottom: "0.3em" }}>
                   <span>Exact Match</span>
@@ -290,7 +320,7 @@ function App() {
                 <div className="ios-toggle-container">
                   <div
                     className={`ios-toggle ${exactMatch ? "checked" : ""}`}
-                    onClick={toggleExactMatch}
+                    onClick={() => setExactMatch(!exactMatch)}
                   />
                   <span className="tooltip">
                     <span className="material-icons">info</span>
@@ -413,12 +443,24 @@ function App() {
 
           {/* Results Panel */}
           <div className="panel">
-            <h1 style={{ marginTop: 0 }}>
-              <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-                list_alt
-              </span>
-              Results
-            </h1>
+            {/* Results heading + Message Filter toggle in same line */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+              {/* Left side: heading with icon */}
+              <h1 style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.3em" }}>
+                <span className="material-icons">list_alt</span>
+                Results
+              </h1>
+              {/* Right side: iOS toggle for 'Message Filter' */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                <label style={{ fontSize: "0.9em", marginBottom: "0.2rem" }}>Message Filter</label>
+                <div className="ios-toggle-container">
+                  <div
+                    className={`ios-toggle ${filterNames ? "checked" : ""}`}
+                    onClick={toggleFilterNames}
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className="results">
               {timestamp ? (
@@ -434,6 +476,7 @@ function App() {
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
                       The original lines from the raw data that correspond to each winner.
+                      Always includes entire message, ignoring filters.
                     </span>
                   </span>
                 </label>
@@ -452,7 +495,7 @@ function App() {
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      The difference between each winner’s guess and the winning number, rounded to 2 decimals.
+                      Each winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
                     </span>
                   </span>
                 </label>
@@ -471,7 +514,8 @@ function App() {
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
-                      List of winners in the format ":W: Name - number :W:".
+                      List of winners in the format ":W: Name - number :W:". 
+                      Name is filtered if "Message Filter" is on.
                     </span>
                   </span>
                 </label>
