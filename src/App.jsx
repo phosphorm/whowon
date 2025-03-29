@@ -14,12 +14,11 @@ function transformName(originalName) {
 }
 
 function App() {
-  // Fields
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
   const [tieMode, setTieMode] = useState("all");
-  // Duplicate is now always enabled, even if exact match is on
+  // Duplicate is always enabled, even if exactMatch is on
   const [duplicateMode, setDuplicateMode] = useState("first");
   const [exactMatch, setExactMatch] = useState(false);
   const [whitelist, setWhitelist] = useState("");
@@ -28,22 +27,12 @@ function App() {
   // New toggle: autoReset. On by default.
   const [autoReset, setAutoReset] = useState(true);
 
-  // Winners & metadata
+  // Results & errors
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
-
-  // Errors
   const [rawDataError, setRawDataError] = useState("");
   const [winningNumberError, setWinningNumberError] = useState("");
   const [numberOfWinnersError, setNumberOfWinnersError] = useState("");
-
-  // Quick function to clear results if autoReset is on
-  function maybeResetResults() {
-    if (autoReset) {
-      setWinners([]);
-      setTimestamp("");
-    }
-  }
 
   function clearErrors() {
     setRawDataError("");
@@ -51,7 +40,15 @@ function App() {
     setNumberOfWinnersError("");
   }
 
-  // OnChange handlers for input fields: if autoReset is on, we reset winners
+  // If autoReset is on, modifying any input clears results
+  function maybeResetResults() {
+    if (autoReset) {
+      setWinners([]);
+      setTimestamp("");
+    }
+  }
+
+  // OnChange handlers
   const handleRawDataChange = (e) => {
     setRawData(e.target.value);
     maybeResetResults();
@@ -77,8 +74,7 @@ function App() {
     maybeResetResults();
   };
 
-  // Exact match toggle: if turning ON, reset numberOfWinners to "" 
-  // and maybe reset results if autoReset is on
+  // Toggling exact match: if turning on, blank out numberOfWinners
   const handleExactMatchToggle = () => {
     const newVal = !exactMatch;
     setExactMatch(newVal);
@@ -88,7 +84,7 @@ function App() {
     maybeResetResults();
   };
 
-  // Toggling the autoReset
+  // Toggling auto-reset
   const handleAutoResetToggle = () => {
     setAutoReset(!autoReset);
   };
@@ -202,6 +198,7 @@ function App() {
     setDuplicateMode("first");
     setWhitelist("");
     setExactMatch(false);
+    setFilterNames(true);
     setWinners([]);
     setTimestamp("");
     clearErrors();
@@ -318,7 +315,7 @@ function App() {
               </div>
 
               <div className="field" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                <div style={{ flex: 1 }} className={!exactMatch ? "" : ""}>
+                <div style={{ flex: 1 }}>
                   <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
                     <div className="label-with-icon">
                       Number of Winners
@@ -350,7 +347,7 @@ function App() {
                     <span className="tooltip">
                       <span className="material-icons" style={{ fontSize: "18px", color: "#888" }}>info</span>
                       <span className="tooltiptext">
-                        Only pick entries whose number matches exactly. Tie handling is disabled. 
+                        Only pick entries whose number matches exactly. 
                       </span>
                     </span>
                   </div>
@@ -438,7 +435,8 @@ function App() {
                     <span className="material-icons">local_offer</span>
                     Promo
                     <span className="tooltiptext">
-                      Sets Number of Winners=2, Duplicate=Keep First, Tie=First Answer, disables Exact Match.
+                      Sets Number of Winners=2, Duplicate=Keep First, Tie=First Answer, 
+                      disables Exact Match, and auto-resets results if that toggle is on.
                     </span>
                   </button>
 
@@ -446,7 +444,8 @@ function App() {
                     <span className="material-icons">history</span>
                     Classic
                     <span className="tooltiptext">
-                      Sets Number of Winners=1, Duplicate=Keep Last, Tie=Include Ties, disables Exact Match.
+                      Sets Number of Winners=1, Duplicate=Keep Last, Tie=Include Ties, 
+                      disables Exact Match, and auto-resets results if that toggle is on.
                     </span>
                   </button>
                 </div>

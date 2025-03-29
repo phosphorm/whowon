@@ -18,6 +18,7 @@ html, body {
 
 /* 
   Outer container for vertical & horizontal centering.
+  If content exceeds the viewport, it scrolls. Otherwise, it's fully centered.
 */
 .app-outer {
   min-height: 100vh;
@@ -123,11 +124,13 @@ html, body {
   margin-bottom: 1rem; /* default spacing below each panel */
 }
 
-.presets-block {
-  margin-bottom: 0; 
-}
+/* 
+  The .presets-block is also a .panel,
+  so it already has margin-bottom:1rem from .panel. 
+  We only remove bottom margin from the panel's last child to avoid internal empty space.
+*/
 .presets-block > *:last-child {
-  margin-bottom: 0 !important;
+  margin-bottom: 0 !important; /* remove internal bottom margin from last child */
 }
 
 /* 
@@ -298,7 +301,7 @@ button {
   }
 }
 
-/* Muted red for reset button, keep corners, hover, etc. */
+/* Muted red for reset button */
 .reset-button {
   width: 2rem;
   height: 2rem;
