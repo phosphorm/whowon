@@ -12,7 +12,7 @@ html, body {
   min-height: 100vh;
 }
 
-/* Main container: up to 900px wide, centered horizontally, with padding. */
+/* Main container: up to 900px wide, centered horizontally, with padding */
 .app {
   max-width: 900px;
   margin: 0 auto;
@@ -21,8 +21,7 @@ html, body {
   z-index: 0;
 }
 
-/* Subtle animated background gradient behind everything, 
-   using ::before so it doesn't affect layout. */
+/* Subtle animated background gradient behind everything, using ::before so it doesn't affect layout. */
 .app::before {
   content: "";
   position: fixed; /* stays fixed in the viewport */
@@ -44,19 +43,18 @@ html, body {
   }
 }
 
-/* Header: non-sticky, wraps if space is tight */
+/* Header: now contained within .app, no fixed width so it won't exceed columns. */
 .header {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
   background: #0f0f0f;
   padding: 0.8rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 1rem;
 }
 
-/* Header text styles */
 .header .header-left {
   font-size: 1.2rem;
   font-weight: 600;
@@ -76,13 +74,12 @@ html, body {
   color: #fff;
 }
 
-/* Main content layout: two columns that match in height. */
+/* Two columns in main content, stretch to match height. */
 .content {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
   align-items: stretch;
-  margin-top: 1rem;
   padding-bottom: 2rem;
 }
 .left,
@@ -96,7 +93,7 @@ html, body {
   flex: 2 1 0; /* left panel is a bit wider */
 }
 
-/* Panels for input and output sections */
+/* Panels fill their column height. */
 .panel {
   background: #1a1a1a;
   border-radius: 8px;
@@ -206,6 +203,9 @@ button {
   padding: 0.6em 1.2em;
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
+  display: inline-flex;
+  align-items: center; /* so icon & text align well */
+  gap: 0.4em;
 }
 .primary-btn {
   background-color: #008800;
@@ -230,11 +230,16 @@ button {
   background-color: #3a3a3a;
 }
 
+/* Make the "Pick Winners" button span the entire left column width */
+.pick-winners-wide {
+  width: 100%;
+}
+
 /* Results / output styling */
 .results {
   display: flex;
   flex-direction: column;
-  flex: 1; /* fill the panel’s space */
+  flex: 1;
 }
 .no-winners {
   color: #888;
@@ -254,35 +259,8 @@ button {
 }
 
 /* 
-  .original-later, .differences-later, .winners-later 
-  used to reorder results on large vs mobile screens
-*/
-.original-later {
-  order: 1; /* default desktop: appear first */
-}
-.differences-later {
-  order: 2; /* default desktop: second */
-}
-.winners-later {
-  order: 3; /* default desktop: last (bottom) */
-}
-
-/* On smaller screens, show winners-later first, then original, then differences. */
-@media (max-width: 600px) {
-  .winners-later {
-    order: 1;
-  }
-  .original-later {
-    order: 2;
-  }
-  .differences-later {
-    order: 3;
-  }
-}
-
-/* 
   .winners-field is only added dynamically if winners are picked,
-  causing the green outline and glow. 
+  giving the green outline/glow 
 */
 .winners-field {
   border: 2px solid #00ff00;
@@ -295,4 +273,13 @@ button {
   font-size: 1.05em;
   font-weight: 600;
   margin-bottom: 0.5rem;
+}
+
+/* Make a simple class for the "Reset" button on the right column, 
+   so we can position it at top-right if desired. 
+   We'll keep it simple: just float it right with margin. */
+.reset-right {
+  align-self: flex-end;
+  margin-bottom: 1rem;
+  display: inline-flex;
 }
