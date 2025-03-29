@@ -3,28 +3,17 @@ import "./App.css";
 
 /**
  * Transform the name if the 'Message Filter' is on.
- *
- * Implementation:
- *   - Keep the entire first "word" as is (with hyphens, etc).
- *   - For the second "word," keep only its first letter if it’s alpha, ignoring trailing digits/currency chars.
- *   - If no second word or no alpha letter, skip it entirely.
  */
 function transformName(originalName) {
   const words = originalName.trim().split(/\s+/);
-  if (words.length === 0) return originalName;
+  if (!words.length) return originalName;
+  const firstWord = words[0];
+  const secondWord = words[1] || "";
 
-  const firstChunk = words[0]; // keep as is
-  let secondChunk = words[1] || "";
-
-  // remove non-alpha from second chunk
-  const alphaOnly = secondChunk.replace(/[^a-zA-Z]/g, "");
+  const alphaOnly = secondWord.replace(/[^a-zA-Z]/g, "");
   const secondLetter = alphaOnly.length > 0 ? alphaOnly[0] : "";
 
-  let finalName = firstChunk;
-  if (secondLetter) {
-    finalName += " " + secondLetter;
-  }
-  return finalName;
+  return secondLetter ? `${firstWord} ${secondLetter}` : firstWord;
 }
 
 function App() {
@@ -32,8 +21,8 @@ function App() {
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
-  const [tieMode, setTieMode] = useState("all");       // "all" or "first"
-  const [duplicateMode, setDuplicateMode] = useState("first"); // "first" or "last"
+  const [tieMode, setTieMode] = useState("all");
+  const [duplicateMode, setDuplicateMode] = useState("first");
   const [exactMatch, setExactMatch] = useState(false);
   const [whitelist, setWhitelist] = useState("");
 
@@ -63,7 +52,6 @@ function App() {
       .map((line, index) => ({ line: line.trim(), index }))
       .filter(item => item.line.length > 0)
       .map(({ line, index }) => {
-        // extract first number pattern
         const match = line.match(/([-+]?[0-9]*[.,]?[0-9]+)/);
         if (match) {
           const numberValue = parseFloat(match[0].replace(",", "."));
@@ -75,25 +63,21 @@ function App() {
       .filter(item => item !== null);
   };
 
-  // "Pick Winners" 
+  // "Pick Winners"
   const handleSubmit = (e) => {
     e.preventDefault();
     clearErrors();
 
     let hasError = false;
-
-    // Validate rawData
     if (!rawData.trim()) {
       setRawDataError("No data provided. Please enter at least one name/number pair.");
       hasError = true;
     }
-    // Validate winningNumber
     const target = parseFloat(winningNumber);
     if (isNaN(target)) {
       setWinningNumberError("Please provide a valid numeric Winning Number.");
       hasError = true;
     }
-    // Validate numberOfWinners if exactMatch is off
     if (!exactMatch) {
       const wCount = parseInt(numberOfWinners, 10);
       if (isNaN(wCount) || wCount < 1) {
@@ -101,18 +85,17 @@ function App() {
         hasError = true;
       }
     }
-
-    if (hasError) return; // stop if invalid
+    if (hasError) return;
 
     const entries = parseRawData(rawData);
 
-    // Whitelist array
+    // Whitelist
     const whitelistArray = whitelist
       .split(",")
       .map(name => name.trim())
       .filter(name => name !== "");
 
-    // Filter duplicates 
+    // Filter duplicates
     const filteredEntries = [];
     const seen = {};
     for (const entry of entries) {
@@ -133,11 +116,11 @@ function App() {
     }
 
     let selectedWinners = [];
-    // If exactMatch is on, just pick those whose number == target
     if (exactMatch) {
-      selectedWinners = filteredEntries.filter(e => e.number === target);
+      const t = parseFloat(winningNumber);
+      selectedWinners = filteredEntries.filter(e => e.number === t);
     } else {
-      // Otherwise, sort by closeness
+      // Sort by closeness
       const sortedEntries = filteredEntries.sort((a, b) => {
         const diffA = Math.abs(a.number - target);
         const diffB = Math.abs(b.number - target);
@@ -151,7 +134,6 @@ function App() {
       if (tieMode === "first") {
         selectedWinners = sortedEntries.slice(0, wCount);
       } else {
-        // "all" -> include ties after top N
         selectedWinners = sortedEntries.slice(0, wCount);
         if (selectedWinners.length > 0) {
           const thresholdDiff = Math.abs(selectedWinners[selectedWinners.length - 1].number - target);
@@ -184,14 +166,13 @@ function App() {
     clearErrors();
   };
 
-  // Preset "Promo" 
+  // Presets
   const handlePromoPreset = () => {
     setNumberOfWinners("2");
     setDuplicateMode("first");
     setTieMode("first");
     setExactMatch(false);
   };
-  // Preset "Classic"
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
@@ -199,7 +180,7 @@ function App() {
     setExactMatch(false);
   };
 
-  // "Message Filter" toggle 
+  // Toggle for "Message Filter"
   const toggleFilterNames = () => {
     setFilterNames(!filterNames);
   };
@@ -222,7 +203,7 @@ function App() {
     })
     .join("\n");
 
-  // Winners field glows if there are winners
+  // Winners field glows if we have winners
   const winnersBoxClass = `field ${winners.length > 0 ? "winners-field" : ""}`;
   // tie/duplicate fields disabled if exactMatch is on
   const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
@@ -239,12 +220,10 @@ function App() {
         <main className="content">
           {/* Left Panel */}
           <div className="left panel">
-            <h1>
-              <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-                tune
-              </span>
+            <h2 className="section-title">
+              <span className="material-icons">tune</span>
               Inputs
-            </h1>
+            </h2>
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
               {/* Raw Data */}
@@ -290,11 +269,11 @@ function App() {
               </div>
 
               {/* Number of Winners & Exact Match Toggle side by side */}
-              <div className="field" style={{ display: "flex", gap: "1rem" }}>
-                {/* Number of Winners block (possibly grayed out if exactMatch) */}
+              <div className="field" style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                {/* Number of Winners block (possibly grayed if exactMatch) */}
                 <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
                   <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
-                    <div>
+                    <div className="num-winners-label">
                       Number of Winners
                       <span className="tooltip">
                         <span className="material-icons">info</span>
@@ -317,9 +296,9 @@ function App() {
                 </div>
 
                 {/* Exact Match toggle remains active even if exactMatch is on */}
-                <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
                   <label style={{ marginBottom: "0.3em" }}>
-                    <span>Exact Match</span>
+                    Exact Match
                   </label>
                   <div className="ios-toggle-container">
                     <div
@@ -336,7 +315,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Tie & duplicate fields side by side, disabled if exactMatch. */}
+              {/* Tie & duplicate fields side by side */}
               <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
                 <div className="field" style={{ flex: 1 }}>
                   <label htmlFor="tieMode">
@@ -344,7 +323,7 @@ function App() {
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
-                        If multiple entries are equally close, pick only the first N or include all ties.
+                        If multiple entries are equally close, pick only the first or include all ties.
                       </span>
                     </span>
                   </label>
@@ -417,10 +396,8 @@ function App() {
           <div className="right" style={{ flexDirection: "column" }}>
             {/* Presets Panel */}
             <div className="panel">
-              <h2 style={{ marginTop: 0, marginBottom: "0.8rem" }}>
-                <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-                  widgets
-                </span>
+              <h2 className="section-title">
+                <span className="material-icons">widgets</span>
                 Presets
               </h2>
               <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
@@ -430,20 +407,15 @@ function App() {
                     <span className="material-icons">local_offer</span>
                     Promo
                     <span className="tooltiptext">
-                      Sets Number of Winners to 2, 
-                      Duplicate Handling to Keep First, 
-                      Tie Handling to First Answer, 
-                      and disables Exact Match.
+                      Sets Number of Winners=2, Duplicate=Keep First, Tie=First Answer, disables Exact Match.
                     </span>
                   </button>
+
                   <button className="secondary-btn tooltip" onClick={handleClassicPreset}>
                     <span className="material-icons">history</span>
                     Classic
                     <span className="tooltiptext">
-                      Sets Number of Winners to 1, 
-                      Duplicate Handling to Keep Last, 
-                      Tie Handling to Include Ties, 
-                      and disables Exact Match.
+                      Sets Number of Winners=1, Duplicate=Keep Last, Tie=Include Ties, disables Exact Match.
                     </span>
                   </button>
                 </div>
@@ -463,12 +435,12 @@ function App() {
             {/* Results Panel */}
             <div className="panel">
               {/* Results heading + Message Filter toggle in same line */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.3rem" }}>
                 {/* Left side: heading with icon */}
-                <h1 style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.3em" }}>
+                <h2 className="section-title" style={{ marginBottom: 0 }}>
                   <span className="material-icons">list_alt</span>
                   Results
-                </h1>
+                </h2>
                 {/* Right side: iOS toggle for 'Message Filter' + info icon */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.3em", marginBottom: "0.2rem" }}>
@@ -477,8 +449,8 @@ function App() {
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
                         When enabled, the second word in each winner’s name is shortened 
-                        by removing messages/digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98". 
-                        The original messages are always unchanged.
+                        by removing digits/currency, e.g. "Ben Bowej98" -&gt; "Ben B". 
+                        Original messages are always unchanged.
                       </span>
                     </span>
                   </div>
@@ -493,7 +465,9 @@ function App() {
 
               <div className="results">
                 {timestamp ? (
-                  <p><strong>Timestamp:</strong> {timestamp}</p>
+                  <p className="timestamp">
+                    <strong>Timestamp:</strong> {timestamp}
+                  </p>
                 ) : (
                   <p className="no-winners">No winners picked yet.</p>
                 )}
@@ -524,7 +498,7 @@ function App() {
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
-                        Each winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
+                        Winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
                       </span>
                     </span>
                   </label>

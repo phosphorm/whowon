@@ -3,8 +3,7 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 /* 
-  Make html/body fill the screen height so we can vertically center content 
-  with flex in .app-outer 
+  Fill the entire viewport so we can center content vertically as well as horizontally
 */
 html, body {
   margin: 0;
@@ -18,22 +17,22 @@ html, body {
 }
 
 /* 
-  .app-outer ensures we center everything both horizontally & vertically. 
-  If content is taller than the screen, it scrolls, but if it fits, it's centered. 
+  Outer container for vertical & horizontal centering.
+  If content exceeds the viewport, it scrolls. Otherwise, it's fully centered.
 */
 .app-outer {
   min-height: 100vh;
   display: flex;
-  justify-content: center;      /* horizontal center */
-  align-items: center;         /* vertical center */
-  flex-direction: column;      /* we place .app inside, top to bottom */
+  justify-content: center;  /* center horizontally */
+  align-items: center;      /* center vertically */
+  flex-direction: column;
   box-sizing: border-box;
 }
 
 /* 
-  The main .app container: 
-  - up to 900px wide 
-  - leftover horizontal centering is handled by .app-outer, but we keep max-width. 
+  The main .app container:
+  - up to 900px wide
+  - leftover horizontal centering is handled by .app-outer
 */
 .app {
   max-width: 900px;
@@ -67,9 +66,9 @@ html, body {
   justify-content: space-between;
   align-items: center;
   background: #0f0f0f;
-  padding: 0.5rem 1rem;  /* reduced vertical padding */
+  padding: 0.5rem 1rem; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  margin-bottom: 0.8rem;  /* reduced spacing below header */
+  margin-bottom: 0.8rem;
 }
 .header .header-left {
   font-size: 1.2rem;
@@ -90,11 +89,11 @@ html, body {
   color: #fff;
 }
 
-/* Two-column main content layout, with smaller spacing. */
+/* Main content: two columns, smaller spacing. */
 .content {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem; 
+  gap: 1rem;
   align-items: stretch;
   padding-bottom: 1rem;
 }
@@ -112,35 +111,34 @@ html, body {
 .panel {
   background: #1a1a1a;
   border-radius: 8px;
-  padding: 1rem;  
+  padding: 1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 1rem; 
+  margin-bottom: 1rem;
 }
 
-/* Headings */
-h1, h2 {
-  margin: 0 0 0.5em;
+/* 
+  Unified heading style for all sections (Inputs, Presets, Results).
+  Matches the size of the Presets one => 1.2em.
+*/
+.section-title {
+  font-size: 1.2em;  /* consistent for all headings */
+  margin: 0 0 0.8rem 0;  /* top is 0, bottom is 0.8rem */
   font-weight: 700;
-}
-h1 {
-  font-size: 1.6em;
-}
-h2 {
-  font-size: 1.2em;
-  font-weight: 600;
-  margin-top: 0;
+  display: flex;
+  align-items: center; /* so icon & text line up */
+  gap: 0.4em;         /* small space between icon & text */
 }
 
-/* Form field group */
+/* Form fields */
 .field {
-  margin-bottom: 0.8rem; 
+  margin-bottom: 0.8rem;
 }
 .field label {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* left alignment */
   align-items: center;
   font-weight: 500;
   font-size: 0.95em;
@@ -150,6 +148,13 @@ h2 {
   font-size: 18px;
   color: #888;
   cursor: help;
+}
+
+/* Slight space between label text and info icon for "Number of Winners" */
+.num-winners-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em; /* add a bit of space before the info icon */
 }
 
 /* Inline error text styling */
@@ -163,7 +168,7 @@ h2 {
 /* Tooltip container */
 .tooltip {
   position: relative;
-  display: inline-flex; /* to wrap icon/text neatly */
+  display: inline-flex;
   align-items: center;
 }
 .tooltip .tooltiptext {
@@ -282,6 +287,10 @@ button {
   color: #888;
   font-style: italic;
 }
+
+/* 
+   Deprioritized fields 
+*/
 .deprioritized {
   opacity: 0.7;
   font-size: 0.9em;
@@ -346,4 +355,14 @@ button {
 .disabled-section {
   opacity: 0.3;
   pointer-events: none;
+}
+
+/* 
+  Smaller, less prominent timestamp 
+  Also reduce top margin to reduce space between heading & timestamp 
+*/
+.timestamp {
+  font-size: 0.85em;
+  color: #bbb;
+  margin: 0.3rem 0 0.5rem 0; 
 }
