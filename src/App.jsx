@@ -135,45 +135,6 @@ function App() {
         {/* Left Column */}
         <div className="left-column">
           <div className="form-group">
-            <label htmlFor="winningNumber">Winning Number:</label>
-            <input
-              id="winningNumber"
-              type="text"
-              value={winningNumber}
-              onChange={(e) => setWinningNumber(e.target.value)}
-              placeholder="Enter winning number"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="numberOfWinners">Number of Winners:</label>
-            <input
-              id="numberOfWinners"
-              type="number"
-              value={numberOfWinners}
-              onChange={(e) => setNumberOfWinners(e.target.value)}
-              placeholder="Enter number of winners"
-              min="1"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="winnersOutput">Winners Output:</label>
-            <textarea
-              id="winnersOutput"
-              readOnly
-              rows="8"
-              value={winnersText}
-              placeholder="Winners will appear here..."
-            />
-          </div>
-          <div className="form-group buttons">
-            <button type="submit">Pick Winners</button>
-            <button type="button" onClick={handleReset}>Reset</button>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="right-column">
-          <div className="form-group">
             <label htmlFor="rawData">Raw Data:</label>
             <textarea
               id="rawData"
@@ -244,9 +205,47 @@ function App() {
             </label>
           </div>
         </div>
+
+        {/* Right Column */}
+        <div className="right-column">
+          <div className="form-group">
+            <label htmlFor="winningNumber">Winning Number:</label>
+            <input
+              id="winningNumber"
+              type="text"
+              value={winningNumber}
+              onChange={(e) => setWinningNumber(e.target.value)}
+              placeholder="Enter winning number"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="numberOfWinners">Number of Winners:</label>
+            <input
+              id="numberOfWinners"
+              type="number"
+              value={numberOfWinners}
+              onChange={(e) => setNumberOfWinners(e.target.value)}
+              placeholder="Enter number of winners"
+              min="1"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="winnersOutput">Winners Output:</label>
+            <textarea
+              id="winnersOutput"
+              readOnly
+              rows="8"
+              value={winnersText}
+              placeholder="Winners will appear here..."
+            />
+          </div>
+          <div className="form-group buttons">
+            <button type="submit">Pick Winners</button>
+            <button type="button" onClick={handleReset}>Reset</button>
+          </div>
+        </div>
       </form>
 
-      {/* Timestamp and (optional) extra winners section */}
       {timestamp && (
         <div className="results">
           <p><strong>Timestamp:</strong> {timestamp}</p>
