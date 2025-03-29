@@ -100,6 +100,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1; 
+  margin-bottom: 2rem; /* slight spacing between stacked panels in right column */
 }
 
 /* Headings */
@@ -306,31 +307,8 @@ button {
   transform: translateX(16px);
 }
 
-/* 
-  The new "Presets" block and the "Results" block each get an order on wide screens:
-  - presets-block: order 0 (top)
-  - results-block: order 1
-  On mobile, we flip them so presets is last.
-*/
-.presets-block {
-  order: 0;
-}
-.results-block {
-  order: 1;
-}
-
-/* On mobile, show results block first, presets second. */
-@media (max-width: 600px) {
-  .presets-block {
-    order: 2;
-  }
-  .results-block {
-    order: 1;
-  }
-}
-
-/* Additional styling to show disabled options (tie & duplicate) more obviously
-   grayed out when exact match is on. */
+/* Additional styling to show disabled options (tie & duplicate) 
+   more obviously grayed out when exact match is on. */
 .disabled-section {
   opacity: 0.3;
   pointer-events: none; /* can't be changed while disabled */

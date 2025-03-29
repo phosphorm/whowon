@@ -336,110 +336,113 @@ function App() {
           </form>
         </div>
 
-        {/* Right Panel */}
-        {/* PRESETS block on top (order:0 on desktop, order:2 on mobile) */}
-        <div className="right panel presets-block">
-          <h2 style={{ marginTop: 0 }}>
-            <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-              widgets
-            </span>
-            Presets
-          </h2>
+        {/* Right Column: Two stacked panels:
+            1) Presets/Reset
+            2) Results
+        */}
+        <div className="right" style={{ flexDirection: "column" }}>
+          {/* Presets Panel */}
+          <div className="panel">
+            <h2 style={{ marginTop: 0 }}>
+              <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
+                widgets
+              </span>
+              Presets
+            </h2>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+              {/* "Promo" & "Classic" on the left */}
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button className="secondary-btn" onClick={handlePromoPreset}>
+                  <span className="material-icons">local_offer</span>
+                  Promo
+                </button>
+                <button className="secondary-btn" onClick={handleClassicPreset}>
+                  <span className="material-icons">history</span>
+                  Classic
+                </button>
+              </div>
 
-          <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
-            {/* "Promo" & "Classic" on the left */}
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <button className="secondary-btn" onClick={handlePromoPreset}>
-                <span className="material-icons">local_offer</span>
-                Promo
-              </button>
-              <button className="secondary-btn" onClick={handleClassicPreset}>
-                <span className="material-icons">history</span>
-                Classic
-              </button>
-            </div>
-
-            {/* Reset icon on the right */}
-            <div style={{ marginLeft: "auto" }}>
-              <button className="secondary-btn reset-button" onClick={handleReset}>
-                <span className="material-icons">refresh</span>
-              </button>
+              {/* Reset icon on the right */}
+              <div style={{ marginLeft: "auto" }}>
+                <button className="secondary-btn reset-button" onClick={handleReset}>
+                  <span className="material-icons">refresh</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* RESULTS block (order:1 on desktop, order:1 on mobile - so it's still above the presets on mobile? 
-            Actually user wants it at top on mobile, so we keep it order:1, and presets is order:2. */}
-        <div className="right panel results-block">
-          <h1 style={{ marginTop: 0 }}>
-            <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-              list_alt
-            </span>
-            Results
-          </h1>
+          {/* Results Panel */}
+          <div className="panel">
+            <h1 style={{ marginTop: 0 }}>
+              <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
+                list_alt
+              </span>
+              Results
+            </h1>
 
-          <div className="results">
-            {timestamp ? (
-              <p><strong>Timestamp:</strong> {timestamp}</p>
-            ) : (
-              <p className="no-winners">No winners picked yet.</p>
-            )}
+            <div className="results">
+              {timestamp ? (
+                <p><strong>Timestamp:</strong> {timestamp}</p>
+              ) : (
+                <p className="no-winners">No winners picked yet.</p>
+              )}
 
-            <div className="field deprioritized">
-              <label htmlFor="originalOutput">
-                Original Messages
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    The original lines from the raw data that correspond to each winner.
+              <div className="field deprioritized">
+                <label htmlFor="originalOutput">
+                  Original Messages
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      The original lines from the raw data that correspond to each winner.
+                    </span>
                   </span>
-                </span>
-              </label>
-              <textarea
-                id="originalOutput"
-                rows="5"
-                readOnly
-                value={originalDataText}
-                placeholder="Original entries of winners will appear here..."
-              />
-            </div>
+                </label>
+                <textarea
+                  id="originalOutput"
+                  rows="5"
+                  readOnly
+                  value={originalDataText}
+                  placeholder="Original entries of winners will appear here..."
+                />
+              </div>
 
-            <div className="field deprioritized">
-              <label htmlFor="differencesOutput">
-                Name(s) &amp; Difference
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    The difference between each winner’s guess and the winning number, rounded to 2 decimals.
+              <div className="field deprioritized">
+                <label htmlFor="differencesOutput">
+                  Name(s) &amp; Difference
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      The difference between each winner’s guess and the winning number, rounded to 2 decimals.
+                    </span>
                   </span>
-                </span>
-              </label>
-              <textarea
-                id="differencesOutput"
-                rows="5"
-                readOnly
-                value={differencesText}
-                placeholder="No differences to display yet..."
-              />
-            </div>
+                </label>
+                <textarea
+                  id="differencesOutput"
+                  rows="5"
+                  readOnly
+                  value={differencesText}
+                  placeholder="No differences to display yet..."
+                />
+              </div>
 
-            <div className={winnersBoxClass}>
-              <label htmlFor="winnersOutput">
-                Winners
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    List of winners in the format ":W: Name - number :W:".
+              <div className={winnersBoxClass}>
+                <label htmlFor="winnersOutput">
+                  Winners
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      List of winners in the format ":W: Name - number :W:".
+                    </span>
                   </span>
-                </span>
-              </label>
-              <textarea
-                id="winnersOutput"
-                rows="5"
-                readOnly
-                value={winnersText}
-                placeholder="No winners to display yet..."
-              />
+                </label>
+                <textarea
+                  id="winnersOutput"
+                  rows="5"
+                  readOnly
+                  value={winnersText}
+                  placeholder="No winners to display yet..."
+                />
+              </div>
             </div>
           </div>
         </div>
