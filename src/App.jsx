@@ -127,12 +127,12 @@ function App() {
 
   return (
     <div className="app">
-      {/* Header (non-sticky) */}
+      {/* Header wraps on small screens */}
       <header className="header">
-        {/* Changed heading to "who won?" */}
+        {/* Heading changed to "who won?" */}
         <div className="header-left">who won?</div>
         <div className="header-right">
-          {/* Could add links or other content here */}
+          {/* Additional links or content could go here */}
         </div>
       </header>
 

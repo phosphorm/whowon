@@ -5,13 +5,15 @@
 html, body {
   margin: 0;
   padding: 0;
+  /* Hide any minor horizontal overflow if it occurs (e.g., shadows, rounding): */
+  overflow-x: hidden;
   background-color: #0d0d0d; /* nearly black background */
   color: #f0f0f0;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
 }
 
-/* 
+/*
   Main container: up to 900px wide, centered horizontally, with padding.
 */
 .app {
@@ -22,21 +24,20 @@ html, body {
   z-index: 0;
 }
 
-/* 
+/*
   Subtle animated background gradient behind everything.
-  We'll place a ::before pseudo-element behind .app so it doesn't affect layout.
+  Using a ::before pseudo-element on .app so it doesn't affect layout.
 */
 .app::before {
   content: "";
-  position: fixed;
+  position: fixed; /* stays fixed in the viewport */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: -1;
-  /* Subtle green radial gradient in the center, fading to transparent */
   background: radial-gradient(circle at 50% 50%, rgba(0,255,0,0.07), transparent 70%);
-  /* A small scale “pulse” animation */
+  /* Gentle "pulse" animation */
   animation: subtleBg 10s ease-in-out infinite alternate;
 }
 
@@ -49,16 +50,19 @@ html, body {
   }
 }
 
-/* Header (non-sticky). It's within .app so it's centered. */
+/* Header: non-sticky, and wrapping if space is tight */
 .header {
-  width: 100%;
-  background: #0f0f0f;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  background: #0f0f0f;
   padding: 0.8rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
+
+/* Header text styles */
 .header .header-left {
   font-size: 1.2rem;
   font-weight: 600;
@@ -66,12 +70,14 @@ html, body {
 .header .header-right {
   font-size: 0.95rem;
   color: #aaa;
+  /* If you have lots of content, it will wrap onto a new line. */
 }
 .header .header-right a {
   color: #aaa;
   text-decoration: none;
   margin-left: 1rem;
   font-weight: 500;
+  white-space: nowrap; /* optional: keeps short links on one line if you prefer */
 }
 .header .header-right a:hover {
   color: #fff;
