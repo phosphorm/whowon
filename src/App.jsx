@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import "./App.css";
 
 /**
- * Attempt to transform the name if the 'Message Filter' is on.
+ * Transform the name if the 'Message Filter' is on.
+ *
  * Implementation:
- *  - Keep the entire first "word" as is (including hyphens, etc).
- *  - For the second "word," keep only its first letter if it’s alphabetic, ignoring trailing digits/currency chars.
- *  - If there's no second word or no leading letter, omit it altogether.
+ *   - Keep the entire first "word" as is (with hyphens, etc).
+ *   - For the second "word," keep only its first letter if it’s alpha, ignoring trailing digits/currency chars.
+ *   - If no second word or no alpha letter, skip it entirely.
  */
 function transformName(originalName) {
   const words = originalName.trim().split(/\s+/);
@@ -15,9 +16,9 @@ function transformName(originalName) {
   const firstChunk = words[0]; // keep as is
   let secondChunk = words[1] || "";
 
-  // remove non-alpha from second chunk, keep only letters
+  // remove non-alpha from second chunk
   const alphaOnly = secondChunk.replace(/[^a-zA-Z]/g, "");
-  let secondLetter = alphaOnly.length > 0 ? alphaOnly[0] : "";
+  const secondLetter = alphaOnly.length > 0 ? alphaOnly[0] : "";
 
   let finalName = firstChunk;
   if (secondLetter) {
@@ -36,24 +37,33 @@ function App() {
   const [exactMatch, setExactMatch] = useState(false);
   const [whitelist, setWhitelist] = useState("");
 
-  // Winners
+  // Toggle for "Message Filter"
+  const [filterNames, setFilterNames] = useState(true); // default on
+
+  // Winners & metadata
   const [winners, setWinners] = useState([]);
   const [timestamp, setTimestamp] = useState("");
 
-  // Error states
+  // Inline errors
   const [rawDataError, setRawDataError] = useState("");
   const [winningNumberError, setWinningNumberError] = useState("");
   const [numberOfWinnersError, setNumberOfWinnersError] = useState("");
 
-  // NEW: "Message Filter" toggle
-  const [filterNames, setFilterNames] = useState(true); // default ON
+  // Clear error messages
+  const clearErrors = () => {
+    setRawDataError("");
+    setWinningNumberError("");
+    setNumberOfWinnersError("");
+  };
 
+  // Parse the raw data
   const parseRawData = (data) => {
     return data
       .split("\n")
       .map((line, index) => ({ line: line.trim(), index }))
       .filter(item => item.line.length > 0)
       .map(({ line, index }) => {
+        // extract first number pattern
         const match = line.match(/([-+]?[0-9]*[.,]?[0-9]+)/);
         if (match) {
           const numberValue = parseFloat(match[0].replace(",", "."));
@@ -65,30 +75,25 @@ function App() {
       .filter(item => item !== null);
   };
 
-  const clearErrors = () => {
-    setRawDataError("");
-    setWinningNumberError("");
-    setNumberOfWinnersError("");
-  };
-
-  // "Pick Winners"
+  // "Pick Winners" 
   const handleSubmit = (e) => {
     e.preventDefault();
     clearErrors();
 
     let hasError = false;
+
     // Validate rawData
     if (!rawData.trim()) {
       setRawDataError("No data provided. Please enter at least one name/number pair.");
       hasError = true;
     }
-    // Validate winning number
+    // Validate winningNumber
     const target = parseFloat(winningNumber);
     if (isNaN(target)) {
       setWinningNumberError("Please provide a valid numeric Winning Number.");
       hasError = true;
     }
-    // If exactMatch is off, we need a valid numberOfWinners
+    // Validate numberOfWinners if exactMatch is off
     if (!exactMatch) {
       const wCount = parseInt(numberOfWinners, 10);
       if (isNaN(wCount) || wCount < 1) {
@@ -97,7 +102,7 @@ function App() {
       }
     }
 
-    if (hasError) return; // don't proceed if invalid input
+    if (hasError) return; // stop if invalid
 
     const entries = parseRawData(rawData);
 
@@ -107,7 +112,7 @@ function App() {
       .map(name => name.trim())
       .filter(name => name !== "");
 
-    // Filter duplicates
+    // Filter duplicates 
     const filteredEntries = [];
     const seen = {};
     for (const entry of entries) {
@@ -118,7 +123,7 @@ function App() {
           seen[entry.name] = entry;
         } else {
           if (duplicateMode === "last") {
-            seen[entry.name] = entry; // keep later entry
+            seen[entry.name] = entry;
           }
         }
       }
@@ -128,10 +133,11 @@ function App() {
     }
 
     let selectedWinners = [];
+    // If exactMatch is on, just pick those whose number == target
     if (exactMatch) {
       selectedWinners = filteredEntries.filter(e => e.number === target);
     } else {
-      // Sort by closeness
+      // Otherwise, sort by closeness
       const sortedEntries = filteredEntries.sort((a, b) => {
         const diffA = Math.abs(a.number - target);
         const diffB = Math.abs(b.number - target);
@@ -178,13 +184,14 @@ function App() {
     clearErrors();
   };
 
-  // Presets
+  // Preset "Promo" 
   const handlePromoPreset = () => {
     setNumberOfWinners("2");
     setDuplicateMode("first");
     setTieMode("first");
     setExactMatch(false);
   };
+  // Preset "Classic"
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
@@ -192,13 +199,12 @@ function App() {
     setExactMatch(false);
   };
 
-  // Message Filter logic
+  // "Message Filter" toggle 
   const toggleFilterNames = () => {
     setFilterNames(!filterNames);
   };
 
-  // Build output strings
-  // Winners text
+  // Build final outputs
   const winnersText = winners
     .map(w => {
       const dispName = filterNames ? transformName(w.name) : (w.name || "No Name");
@@ -206,10 +212,8 @@ function App() {
     })
     .join("\n");
 
-  // Original messages are always the entire line
   const originalDataText = winners.map(w => w.original).join("\n");
 
-  // Name(s) & difference, rounding to 2 decimals, applying filter if enabled
   const differencesText = winners
     .map(w => {
       const diff = Math.abs(w.number - parseFloat(winningNumber)).toFixed(2);
@@ -218,319 +222,345 @@ function App() {
     })
     .join("\n");
 
-  // The winners box only glows if we have at least one winner
+  // Winners field glows if there are winners
   const winnersBoxClass = `field ${winners.length > 0 ? "winners-field" : ""}`;
-
   // tie/duplicate fields disabled if exactMatch is on
   const tieDuplicateClasses = exactMatch ? "disabled-section" : "";
 
   return (
-    <div className="app">
-      {/* Header */}
-      <header className="header">
-        <div className="header-left">who won?</div>
-        <div className="header-right" />
-      </header>
+    <div className="app-outer">
+      <div className="app">
+        {/* Header */}
+        <header className="header">
+          <div className="header-left">who won?</div>
+          <div className="header-right"></div>
+        </header>
 
-      <main className="content">
-        {/* Left Panel */}
-        <div className="left panel">
-          <h1>
-            <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-              tune
-            </span>
-            Inputs
-          </h1>
+        <main className="content">
+          {/* Left Panel */}
+          <div className="left panel">
+            <h1>
+              <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
+                tune
+              </span>
+              Inputs
+            </h1>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-            {/* Raw Data */}
-            <div className="field">
-              <label htmlFor="rawData">
-                Raw Data
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    Enter one entry per line: each line should contain a name and a number.
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+              {/* Raw Data */}
+              <div className="field">
+                <label htmlFor="rawData">
+                  Raw Data
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      Enter one entry per line: each line should contain a name and a number.
+                    </span>
                   </span>
-                </span>
-              </label>
-              <textarea
-                id="rawData"
-                rows="8"
-                value={rawData}
-                onChange={(e) => setRawData(e.target.value)}
-                placeholder="Paste your raw data here (one name and number per line)..."
-              />
-              {rawDataError && <div className="field-error">{rawDataError}</div>}
-            </div>
+                </label>
+                <textarea
+                  id="rawData"
+                  rows="8"
+                  value={rawData}
+                  onChange={(e) => setRawData(e.target.value)}
+                  placeholder="Paste your raw data here (one name and number per line)..."
+                />
+                {rawDataError && <div className="field-error">{rawDataError}</div>}
+              </div>
 
-            {/* Winning Number */}
-            <div className="field">
-              <label htmlFor="winningNumber">
-                Winning Number
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    The target number to compare or match exactly.
+              {/* Winning Number */}
+              <div className="field">
+                <label htmlFor="winningNumber">
+                  Winning Number
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      The target number to compare or match exactly.
+                    </span>
                   </span>
-                </span>
-              </label>
-              <input
-                id="winningNumber"
-                type="text"
-                value={winningNumber}
-                onChange={(e) => setWinningNumber(e.target.value)}
-                placeholder="Enter the winning number"
-              />
-              {winningNumberError && <div className="field-error">{winningNumberError}</div>}
-            </div>
+                </label>
+                <input
+                  id="winningNumber"
+                  type="text"
+                  value={winningNumber}
+                  onChange={(e) => setWinningNumber(e.target.value)}
+                  placeholder="Enter the winning number"
+                />
+                {winningNumberError && <div className="field-error">{winningNumberError}</div>}
+              </div>
 
-            {/* Number of Winners & Exact Match Toggle side by side */}
-            <div className="field" style={{ display: "flex", gap: "1rem" }}>
-              {/* Number of Winners block, can be grayed if exactMatch is on */}
-              <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
-                <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
-                  <div>
-                    Number of Winners
+              {/* Number of Winners & Exact Match Toggle side by side */}
+              <div className="field" style={{ display: "flex", gap: "1rem" }}>
+                {/* Number of Winners block (possibly grayed out if exactMatch) */}
+                <div style={{ flex: 1 }} className={exactMatch ? "disabled-section" : ""}>
+                  <label htmlFor="numberOfWinners" style={{ justifyContent: "flex-start" }}>
+                    <div>
+                      Number of Winners
+                      <span className="tooltip">
+                        <span className="material-icons">info</span>
+                        <span className="tooltiptext">
+                          How many winners to pick (unless Exact Match is on).
+                        </span>
+                      </span>
+                    </div>
+                  </label>
+                  <input
+                    id="numberOfWinners"
+                    type="number"
+                    value={numberOfWinners}
+                    onChange={(e) => setNumberOfWinners(e.target.value)}
+                    placeholder="Enter number of winners"
+                    min="1"
+                    disabled={exactMatch}
+                  />
+                  {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
+                </div>
+
+                {/* Exact Match toggle remains active even if exactMatch is on */}
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                  <label style={{ marginBottom: "0.3em" }}>
+                    <span>Exact Match</span>
+                  </label>
+                  <div className="ios-toggle-container">
+                    <div
+                      className={`ios-toggle ${exactMatch ? "checked" : ""}`}
+                      onClick={() => setExactMatch(!exactMatch)}
+                    />
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
-                        How many winners to pick (unless Exact Match is on).
+                        Only pick entries whose number matches exactly; tie &amp; duplicate settings won't apply.
                       </span>
                     </span>
                   </div>
+                </div>
+              </div>
+
+              {/* Tie & duplicate fields side by side, disabled if exactMatch. */}
+              <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
+                <div className="field" style={{ flex: 1 }}>
+                  <label htmlFor="tieMode">
+                    Tie Handling
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        If multiple entries are equally close, pick only the first N or include all ties.
+                      </span>
+                    </span>
+                  </label>
+                  <select
+                    id="tieMode"
+                    value={tieMode}
+                    onChange={(e) => setTieMode(e.target.value)}
+                    disabled={exactMatch}
+                  >
+                    <option value="all">Include Ties</option>
+                    <option value="first">First Answer</option>
+                  </select>
+                </div>
+
+                <div className="field" style={{ flex: 1 }}>
+                  <label htmlFor="duplicateMode">
+                    Duplicate Handling
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        If the same name appears multiple times, keep only the first or last occurrence.
+                      </span>
+                    </span>
+                  </label>
+                  <select
+                    id="duplicateMode"
+                    value={duplicateMode}
+                    onChange={(e) => setDuplicateMode(e.target.value)}
+                    disabled={exactMatch}
+                  >
+                    <option value="first">Keep First</option>
+                    <option value="last">Keep Last</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Whitelist */}
+              <div className="field">
+                <label htmlFor="whitelist">
+                  Whitelist Names
+                  <span className="tooltip">
+                    <span className="material-icons">info</span>
+                    <span className="tooltiptext">
+                      Comma-separated names that should not be filtered out as duplicates.
+                    </span>
+                  </span>
                 </label>
                 <input
-                  id="numberOfWinners"
-                  type="number"
-                  value={numberOfWinners}
-                  onChange={(e) => setNumberOfWinners(e.target.value)}
-                  placeholder="Enter number of winners"
-                  min="1"
-                  disabled={exactMatch}
+                  id="whitelist"
+                  type="text"
+                  value={whitelist}
+                  onChange={(e) => setWhitelist(e.target.value)}
+                  placeholder="e.g. Marko K, Ville W"
                 />
-                {numberOfWinnersError && <div className="field-error">{numberOfWinnersError}</div>}
               </div>
 
-              {/* Exact Match toggle remains active even if exactMatch is on */}
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                <label style={{ marginBottom: "0.3em" }}>
-                  <span>Exact Match</span>
-                </label>
-                <div className="ios-toggle-container">
-                  <div
-                    className={`ios-toggle ${exactMatch ? "checked" : ""}`}
-                    onClick={() => setExactMatch(!exactMatch)}
-                  />
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      Only pick entries whose number matches exactly; tie &amp; duplicate settings won't apply.
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
+              {/* "Pick Winners" button fills the width */}
+              <button
+                type="submit"
+                className="primary-btn pick-winners-wide"
+                style={{ marginTop: "auto" }}
+              >
+                <span className="material-icons">done_all</span>
+                Pick Winners
+              </button>
+            </form>
+          </div>
 
-            {/* Tie mode & duplicate mode side by side */}
-            <div className={tieDuplicateClasses} style={{ display: "flex", gap: "1rem" }}>
-              <div className="field" style={{ flex: 1 }}>
-                <label htmlFor="tieMode">
-                  Tie Handling
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      If multiple entries are equally close, pick only the first N or include all ties.
-                    </span>
-                  </span>
-                </label>
-                <select
-                  id="tieMode"
-                  value={tieMode}
-                  onChange={(e) => setTieMode(e.target.value)}
-                  disabled={exactMatch}
-                >
-                  <option value="all">Include Ties</option>
-                  <option value="first">First Answer</option>
-                </select>
-              </div>
-
-              <div className="field" style={{ flex: 1 }}>
-                <label htmlFor="duplicateMode">
-                  Duplicate Handling
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      If the same name appears multiple times, keep only the first or last occurrence.
-                    </span>
-                  </span>
-                </label>
-                <select
-                  id="duplicateMode"
-                  value={duplicateMode}
-                  onChange={(e) => setDuplicateMode(e.target.value)}
-                  disabled={exactMatch}
-                >
-                  <option value="first">Keep First</option>
-                  <option value="last">Keep Last</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Whitelist */}
-            <div className="field">
-              <label htmlFor="whitelist">
-                Whitelist Names
-                <span className="tooltip">
-                  <span className="material-icons">info</span>
-                  <span className="tooltiptext">
-                    Comma-separated names that should not be filtered out as duplicates.
-                  </span>
+          {/* Right Column: Two stacked panels: Presets & Results */}
+          <div className="right" style={{ flexDirection: "column" }}>
+            {/* Presets Panel */}
+            <div className="panel">
+              <h2 style={{ marginTop: 0, marginBottom: "0.8rem" }}>
+                <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
+                  widgets
                 </span>
-              </label>
-              <input
-                id="whitelist"
-                type="text"
-                value={whitelist}
-                onChange={(e) => setWhitelist(e.target.value)}
-                placeholder="e.g. Marko K, Ville W"
-              />
-            </div>
+                Presets
+              </h2>
+              <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
+                {/* "Promo" & "Classic" on the left, with tooltips */}
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button className="secondary-btn tooltip" onClick={handlePromoPreset}>
+                    <span className="material-icons">local_offer</span>
+                    Promo
+                    <span className="tooltiptext">
+                      Sets Number of Winners to 2, 
+                      Duplicate Handling to Keep First, 
+                      Tie Handling to First Answer, 
+                      and disables Exact Match.
+                    </span>
+                  </button>
+                  <button className="secondary-btn tooltip" onClick={handleClassicPreset}>
+                    <span className="material-icons">history</span>
+                    Classic
+                    <span className="tooltiptext">
+                      Sets Number of Winners to 1, 
+                      Duplicate Handling to Keep Last, 
+                      Tie Handling to Include Ties, 
+                      and disables Exact Match.
+                    </span>
+                  </button>
+                </div>
 
-            {/* "Pick Winners" spans entire column */}
-            <button
-              type="submit"
-              className="primary-btn pick-winners-wide"
-              style={{ marginTop: "auto" }}
-            >
-              <span className="material-icons">done_all</span>
-              Pick Winners
-            </button>
-          </form>
-        </div>
-
-        {/* Right Column: Two stacked panels: Presets & Results */}
-        <div className="right" style={{ flexDirection: "column" }}>
-          {/* Presets Panel */}
-          <div className="panel">
-            <h2 style={{ marginTop: 0, marginBottom: "0.8rem" }}>
-              <span className="material-icons" style={{ verticalAlign: "middle", marginRight: "0.3em" }}>
-                widgets
-              </span>
-              Presets
-            </h2>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
-              {/* "Promo" & "Classic" on the left */}
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button className="secondary-btn" onClick={handlePromoPreset}>
-                  <span className="material-icons">local_offer</span>
-                  Promo
-                </button>
-                <button className="secondary-btn" onClick={handleClassicPreset}>
-                  <span className="material-icons">history</span>
-                  Classic
-                </button>
-              </div>
-
-              {/* Reset icon on the right (muted red) */}
-              <div style={{ marginLeft: "auto" }}>
-                <button className="reset-button" onClick={handleReset}>
-                  <span className="material-icons">refresh</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Results Panel */}
-          <div className="panel">
-            {/* Results heading + Message Filter toggle in same line */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-              {/* Left side: heading with icon */}
-              <h1 style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.3em" }}>
-                <span className="material-icons">list_alt</span>
-                Results
-              </h1>
-              {/* Right side: iOS toggle for 'Message Filter' */}
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                <label style={{ fontSize: "0.9em", marginBottom: "0.2rem" }}>Message Filter</label>
-                <div className="ios-toggle-container">
-                  <div
-                    className={`ios-toggle ${filterNames ? "checked" : ""}`}
-                    onClick={toggleFilterNames}
-                  />
+                {/* Reset icon on the right (muted red) */}
+                <div style={{ marginLeft: "auto" }}>
+                  <button className="reset-button tooltip" onClick={handleReset}>
+                    <span className="material-icons">refresh</span>
+                    <span className="tooltiptext">
+                      Clears all fields and errors, returning to defaults.
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="results">
-              {timestamp ? (
-                <p><strong>Timestamp:</strong> {timestamp}</p>
-              ) : (
-                <p className="no-winners">No winners picked yet.</p>
-              )}
-
-              <div className="field deprioritized">
-                <label htmlFor="originalOutput">
-                  Original Messages
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      The original lines from the raw data that correspond to each winner.
-                      Always includes entire message, ignoring filters.
+            {/* Results Panel */}
+            <div className="panel">
+              {/* Results heading + Message Filter toggle in same line */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                {/* Left side: heading with icon */}
+                <h1 style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.3em" }}>
+                  <span className="material-icons">list_alt</span>
+                  Results
+                </h1>
+                {/* Right side: iOS toggle for 'Message Filter' + info icon */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.3em", marginBottom: "0.2rem" }}>
+                    <span style={{ fontSize: "0.9em" }}>Message Filter</span>
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        When enabled, the second word in each winner’s name is shortened 
+                        by removing messages/digits/currency, e.g. "Ben Bcool98" -&gt; "Ben B - 98". 
+                        The original messages are always unchanged.
+                      </span>
                     </span>
-                  </span>
-                </label>
-                <textarea
-                  id="originalOutput"
-                  rows="4"
-                  readOnly
-                  value={originalDataText}
-                  placeholder="Original entries of winners will appear here..."
-                />
+                  </div>
+                  <div className="ios-toggle-container">
+                    <div
+                      className={`ios-toggle ${filterNames ? "checked" : ""}`}
+                      onClick={toggleFilterNames}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="field deprioritized">
-                <label htmlFor="differencesOutput">
-                  Name(s) &amp; Difference
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      Each winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
-                    </span>
-                  </span>
-                </label>
-                <textarea
-                  id="differencesOutput"
-                  rows="4"
-                  readOnly
-                  value={differencesText}
-                  placeholder="No differences to display yet..."
-                />
-              </div>
+              <div className="results">
+                {timestamp ? (
+                  <p><strong>Timestamp:</strong> {timestamp}</p>
+                ) : (
+                  <p className="no-winners">No winners picked yet.</p>
+                )}
 
-              <div className={winnersBoxClass}>
-                <label htmlFor="winnersOutput">
-                  Winners
-                  <span className="tooltip">
-                    <span className="material-icons">info</span>
-                    <span className="tooltiptext">
-                      List of winners in the format ":W: Name - number :W:". 
-                      Name is filtered if "Message Filter" is on.
+                <div className="field deprioritized">
+                  <label htmlFor="originalOutput">
+                    Original Messages
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        The original lines from the raw data that correspond to each winner.
+                        Always includes entire message, ignoring filters.
+                      </span>
                     </span>
-                  </span>
-                </label>
-                <textarea
-                  id="winnersOutput"
-                  rows="4"
-                  readOnly
-                  value={winnersText}
-                  placeholder="No winners to display yet..."
-                />
+                  </label>
+                  <textarea
+                    id="originalOutput"
+                    rows="4"
+                    readOnly
+                    value={originalDataText}
+                    placeholder="Original entries of winners will appear here..."
+                  />
+                </div>
+
+                <div className="field deprioritized">
+                  <label htmlFor="differencesOutput">
+                    Name(s) &amp; Difference
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        Each winner’s name (possibly filtered) plus difference to the winning number, to 2 decimals.
+                      </span>
+                    </span>
+                  </label>
+                  <textarea
+                    id="differencesOutput"
+                    rows="4"
+                    readOnly
+                    value={differencesText}
+                    placeholder="No differences to display yet..."
+                  />
+                </div>
+
+                <div className={winnersBoxClass}>
+                  <label htmlFor="winnersOutput">
+                    Winners
+                    <span className="tooltip">
+                      <span className="material-icons">info</span>
+                      <span className="tooltiptext">
+                        List of winners in the format ":W: Name - number :W:". 
+                        Name is shortened if "Message Filter" is on.
+                      </span>
+                    </span>
+                  </label>
+                  <textarea
+                    id="winnersOutput"
+                    rows="4"
+                    readOnly
+                    value={winnersText}
+                    placeholder="No winners to display yet..."
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

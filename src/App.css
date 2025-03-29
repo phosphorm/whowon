@@ -2,9 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
+/* 
+  Make html/body fill the screen height so we can vertically center content 
+  with flex in .app-outer 
+*/
 html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   overflow-x: hidden; /* Hide minor horizontal overflow if it occurs */
   background-color: #0d0d0d; /* nearly black background */
   color: #f0f0f0;
@@ -12,11 +17,28 @@ html, body {
   min-height: 100vh;
 }
 
-/* Main container: up to 900px wide, centered horizontally, with less overall padding. */
+/* 
+  .app-outer ensures we center everything both horizontally & vertically. 
+  If content is taller than the screen, it scrolls, but if it fits, it's centered. 
+*/
+.app-outer {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;      /* horizontal center */
+  align-items: center;         /* vertical center */
+  flex-direction: column;      /* we place .app inside, top to bottom */
+  box-sizing: border-box;
+}
+
+/* 
+  The main .app container: 
+  - up to 900px wide 
+  - leftover horizontal centering is handled by .app-outer, but we keep max-width. 
+*/
 .app {
   max-width: 900px;
-  margin: 0 auto;
-  padding: 0.5rem;  /* reduced from 1rem */
+  width: 100%;
+  padding: 0.5rem;
   position: relative;
   z-index: 0;
 }
@@ -68,13 +90,13 @@ html, body {
   color: #fff;
 }
 
-/* Main content: two columns, less vertical spacing. */
+/* Two-column main content layout, with smaller spacing. */
 .content {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem; /* reduced gap from 2rem */
+  gap: 1rem; 
   align-items: stretch;
-  padding-bottom: 1rem; /* less bottom padding */
+  padding-bottom: 1rem;
 }
 .left, .right {
   flex: 1 1 0;
@@ -90,12 +112,12 @@ html, body {
 .panel {
   background: #1a1a1a;
   border-radius: 8px;
-  padding: 1rem;  /* reduced from 1.5rem */
+  padding: 1rem;  
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 1rem;  /* reduced from 2rem */
+  margin-bottom: 1rem; 
 }
 
 /* Headings */
@@ -114,7 +136,7 @@ h2 {
 
 /* Form field group */
 .field {
-  margin-bottom: 0.8rem;  /* reduced from 1.2rem */
+  margin-bottom: 0.8rem; 
 }
 .field label {
   display: flex;
@@ -141,7 +163,8 @@ h2 {
 /* Tooltip container */
 .tooltip {
   position: relative;
-  display: inline-block;
+  display: inline-flex; /* to wrap icon/text neatly */
+  align-items: center;
 }
 .tooltip .tooltiptext {
   visibility: hidden;
@@ -173,7 +196,7 @@ input, textarea, select {
   border: none;
   color: #f0f0f0;
   border-radius: 6px;
-  padding: 0.4em 0.6em; /* reduced padding */
+  padding: 0.4em 0.6em; 
   font-size: 1em;
   box-sizing: border-box;
   transition: box-shadow 0.3s, background-color 0.3s;
@@ -196,11 +219,11 @@ button {
   font-weight: 600;
   border: none;
   border-radius: 6px;
-  padding: 0.4em 0.6em; /* reduced padding */
+  padding: 0.4em 0.6em; 
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
   display: inline-flex;
-  align-items: center; /* for icon alignment */
+  align-items: center;
   gap: 0.3em;
 }
 .primary-btn {
@@ -259,7 +282,6 @@ button {
   color: #888;
   font-style: italic;
 }
-/* Visually de-prioritized sections */
 .deprioritized {
   opacity: 0.7;
   font-size: 0.9em;
@@ -272,11 +294,11 @@ button {
   margin-bottom: 0.3em;
 }
 
-/* .winners-field glows if winners exist */
+/* winners-field glows if winners exist */
 .winners-field {
   border: 2px solid #00ff00;
   border-radius: 8px;
-  padding: 0.8rem; /* reduced from 1rem */
+  padding: 0.8rem; 
   box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
   margin-bottom: 1rem;
 }
@@ -320,9 +342,8 @@ button {
   transform: translateX(16px);
 }
 
-/* Additional styling to show disabled options (tie & duplicate) 
-   more obviously grayed out when exact match is on. */
+/* Show disabled options when exact match is on */
 .disabled-section {
   opacity: 0.3;
-  pointer-events: none; /* can't be changed while disabled */
+  pointer-events: none;
 }
