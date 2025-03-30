@@ -59,7 +59,7 @@ html, body {
   100% { transform: scale(1.02); }
 }
 
-/* Header: within .app, so it won't exceed columns */
+/* Header: within .app */
 .header {
   display: flex;
   flex-wrap: nowrap;
@@ -78,8 +78,8 @@ html, body {
   gap: 0.4em;
 }
 .header .header-left .winner-icon {
-  color: #00ff00;         /* green winner icon */
-  font-size: 1.5rem;      /* slightly bigger than text */
+  color: #00ff00;
+  font-size: 1.5rem; /* slightly bigger than text */
 }
 .header .header-right {
   display: flex;
@@ -128,11 +128,7 @@ html, body {
   margin-bottom: 1rem; 
 }
 
-/* 
-  The .presets-block is also a .panel,
-  so it already has margin-bottom:1rem from .panel. 
-  We only remove bottom margin from the panel's last child to avoid internal empty space.
-*/
+/* .presets-block is also a .panel */
 .presets-block > *:last-child {
   margin-bottom: 0 !important;
 }
@@ -179,7 +175,6 @@ html, body {
   color: #888;
   cursor: help;
 }
-
 .label-with-icon {
   display: inline-flex;
   align-items: center;
@@ -246,11 +241,7 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.5);
 }
 
-/* 
-  Base styling for all buttons:
-  Slightly smaller, at 0.9em font-size, 
-  0.4em x 0.6em padding
-*/
+/* Base styling for all buttons, slightly smaller. */
 button {
   font-family: 'Inter', sans-serif;
   font-size: 0.9em;
@@ -265,7 +256,7 @@ button {
   gap: 0.3em;
 }
 
-/* Primary Button: standard green background, hover/active states */
+/* Primary Button */
 .primary-btn {
   background-color: #008800;
   color: #ffffff;
@@ -278,7 +269,7 @@ button {
   background-color: #007500;
 }
 
-/* pick-winners-wide modifies the primary-btn with an animated gradient. */
+/* pick-winners-wide modifies the primary-btn with an animated gradient */
 .pick-winners-wide {
   width: 100%;
   min-height: 3rem;     
@@ -297,7 +288,6 @@ button {
   background-position: 70% 50%;
   box-shadow: none;
 }
-
 @keyframes pickWinnersAnim {
   0% {
     background-position: 0% 50%;
@@ -307,7 +297,7 @@ button {
   }
 }
 
-/* Muted red for the big "clear all" reset button in the Presets panel. */
+/* Muted red for big "clear all" reset button in Presets panel. */
 .reset-button {
   width: 2rem;
   height: 2rem;
@@ -337,18 +327,20 @@ button {
   background-color: #3a3a3a;
 }
 
-/* Additional small reset button for raw data alone */
+/* Raw data only reset button */
 .field-reset-btn {
   background-color: #444;
   color: #fff;
   font-size: 0.75em;  
   padding: 0.2em 0.4em; 
-  margin-left: 0.4rem;
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
   height: 1.5rem; 
   cursor: pointer;
+
+  /* Pushing to the right side while staying in the same row */
+  margin-left: auto; 
 }
 .field-reset-btn:hover {
   background-color: #555;
@@ -359,7 +351,7 @@ button {
 }
 
 /* Instead of partial opacity, we use a more muted color for 
-   Original Messages and Name(s) & Difference
+   Original Message(s) and Difference(s)
 */
 .deprioritized {
   color: #aaa;     
@@ -439,8 +431,7 @@ button {
 }
 
 /* 
-  Graying out # of Winners & Tie Handling if exactMatch is on.
-  We'll apply .disabled-section to the container. 
+  Graying out # of Winners & Ties if exactMatch is on
 */
 .disabled-section {
   opacity: 0.4;

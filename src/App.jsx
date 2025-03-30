@@ -20,8 +20,8 @@ function App() {
   const [rawData, setRawData] = useState("");
   const [winningNumber, setWinningNumber] = useState("");
   const [numberOfWinners, setNumberOfWinners] = useState("");
-  const [tieMode, setTieMode] = useState("all");
-  // Duplicate is always enabled, even if exactMatch is on
+  // "Ties" (previously tieMode)
+  const [tieMode, setTieMode] = useState("all");  
   const [duplicateMode, setDuplicateMode] = useState("first");
   const [exactMatch, setExactMatch] = useState(false);
   const [whitelist, setWhitelist] = useState("");
@@ -194,8 +194,8 @@ function App() {
     setTimestamp(new Date().toLocaleString());
   };
 
+  /** Clears all fields and errors */
   const handleReset = () => {
-    // Clears all fields and errors
     setRawData("");
     setWinningNumber("");
     setNumberOfWinners("");
@@ -215,6 +215,7 @@ function App() {
     maybeResetResults();
   };
 
+  // Promo preset
   const handlePromoPreset = () => {
     setNumberOfWinners("2");
     setDuplicateMode("first");
@@ -222,6 +223,7 @@ function App() {
     setExactMatch(false);
     maybeResetResults();
   };
+  // Classic preset
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
@@ -229,10 +231,7 @@ function App() {
     setExactMatch(false);
     maybeResetResults();
   };
-
-  /** 
-   * Best of 3: # winners = 2, tie=all, dup=first, exactMatch off 
-   */
+  // Best of 3
   const handleBestOf3Preset = () => {
     setNumberOfWinners("2");
     setTieMode("all");
@@ -310,7 +309,7 @@ function App() {
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
               <div className="field">
-                <label htmlFor="rawData" className="label-with-icon">
+                <label htmlFor="rawData" className="label-with-icon" style={{ position: "relative" }}>
                   Raw Data
                   <span className="tooltip">
                     <span className="material-icons">info</span>
@@ -318,20 +317,17 @@ function App() {
                       Enter one entry per line: each line should contain a name and a number.
                     </span>
                   </span>
-
-                  {/* Small Reset (only for Raw Data) */}
-                  <span className="tooltip">
-                    <button
-                      type="button"
-                      className="field-reset-btn"
-                      onClick={handleResetRawData}
-                    >
-                      Reset
-                    </button>
+                  {/* Moved the small Reset (only for Raw Data) to the far right */}
+                  <button
+                    type="button"
+                    className="field-reset-btn tooltip"
+                    onClick={handleResetRawData}
+                  >
+                    Reset
                     <span className="tooltiptext">
                       Clears only the Raw Data box below.
                     </span>
-                  </span>
+                  </button>
                 </label>
                 <textarea
                   id="rawData"
@@ -402,11 +398,11 @@ function App() {
                 </div>
               </div>
 
-              {/* Tie & Duplicate side by side. Tie is grayed out if exactMatch */}
+              {/* Ties & Duplicates side by side. Ties is grayed out if exactMatch */}
               <div style={{ display: "flex", gap: "1rem" }}>
                 <div className={`field ${disableSectionClass}`} style={{ flex: 1 }}>
                   <label htmlFor="tieMode" className="label-with-icon">
-                    Tie Handling
+                    Ties
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
@@ -427,7 +423,7 @@ function App() {
 
                 <div className="field" style={{ flex: 1 }}>
                   <label htmlFor="duplicateMode" className="label-with-icon">
-                    Duplicate Handling
+                    Duplicates
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
@@ -448,7 +444,7 @@ function App() {
 
               <div className="field">
                 <label htmlFor="whitelist" className="label-with-icon">
-                  Whitelist Names
+                  Whitelisted Names
                   <span className="tooltip">
                     <span className="material-icons">info</span>
                     <span className="tooltiptext">
@@ -480,31 +476,39 @@ function App() {
               </h2>
               <div style={{ display: "flex", alignItems: "center", marginBottom: "0.3rem" }}>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {/* Promo Preset */}
                   <button className="secondary-btn tooltip" onClick={handlePromoPreset}>
                     <span className="material-icons">local_offer</span>
                     Promo
-                    <span className="tooltiptext">
-                      Sets Number of Winners=2, Duplicate=Keep First, Tie=First Answer,
-                      disables Exact Match, and auto-resets results if that toggle is on.
+                    <span className="tooltiptext" style="white-space: pre;">
+                      Winners = 2<br/>
+                      Duplicates = Keep First<br/>
+                      Ties = First Answer<br/>
+                      Exact Match = Disabled
                     </span>
                   </button>
 
+                  {/* Classic Preset */}
                   <button className="secondary-btn tooltip" onClick={handleClassicPreset}>
                     <span className="material-icons">history</span>
                     Classic
-                    <span className="tooltiptext">
-                      Sets Number of Winners=1, Duplicate=Keep Last, Tie=Include Ties,
-                      disables Exact Match, and auto-resets results if that toggle is on.
+                    <span className="tooltiptext" style="white-space: pre;">
+                      Winners = 1<br/>
+                      Duplicates = Keep Last<br/>
+                      Ties = Include Ties<br/>
+                      Exact Match = Disabled
                     </span>
                   </button>
 
-                  {/* New Best of 3 preset, same style/size as the others */}
+                  {/* Best of 3 Preset */}
                   <button className="secondary-btn tooltip" onClick={handleBestOf3Preset}>
                     <span className="material-icons">sports_score</span>
                     Best of 3
-                    <span className="tooltiptext">
-                      Sets Number of Winners=2, Tie=Include Ties, Duplicate=Keep First,
-                      disables Exact Match, and auto-resets if toggled on.
+                    <span className="tooltiptext" style="white-space: pre;">
+                      Winners = 2<br/>
+                      Duplicates = Keep First<br/>
+                      Ties = Include Ties<br/>
+                      Exact Match = Disabled
                     </span>
                   </button>
                 </div>
@@ -558,7 +562,7 @@ function App() {
 
                 <div className="field deprioritized">
                   <label htmlFor="originalOutput" className="label-with-icon">
-                    Original Messages
+                    Original Message(s)
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
@@ -578,7 +582,7 @@ function App() {
 
                 <div className="field deprioritized">
                   <label htmlFor="differencesOutput" className="label-with-icon">
-                    Name(s) &amp; Difference
+                    Difference(s)
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
@@ -597,7 +601,7 @@ function App() {
 
                 <div className={winnersBoxClass}>
                   <label htmlFor="winnersOutput" className="label-with-icon">
-                    Winners
+                    Winner(s)
                     <span className="tooltip">
                       <span className="material-icons">info</span>
                       <span className="tooltiptext">
