@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 
 /** 
- * Helper to transform names if filter is on (unchanged from base).
+ * Helper to transform names if filter is on
  */
 function transformName(originalName) {
   const words = originalName.trim().split(/\s+/);
@@ -272,12 +272,17 @@ function App() {
   return (
     <div className="app-outer">
       <div className="app">
+        {/* 
+          Header with a winner icon from google fonts 
+          (emoji_events) at the left side, in green 
+        */}
         <header className="header">
           <div className="header-left">
+            <span className="material-icons winner-icon">emoji_events</span>
             who won?
           </div>
           <div className="header-right">
-            {/* New auto-reset toggle */}
+            {/* auto-reset toggle */}
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
               <div className="tooltip label-with-icon" style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
                 <span style={{ fontSize: "0.9em" }}>Auto-Reset Results</span>

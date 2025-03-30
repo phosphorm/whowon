@@ -77,6 +77,10 @@ html, body {
   align-items: center;
   gap: 0.4em;
 }
+.header .header-left .winner-icon {
+  color: #00ff00;         /* green winner icon */
+  font-size: 1.5rem;      /* slightly bigger than text */
+}
 .header .header-right {
   display: flex;
   align-items: center;
@@ -121,7 +125,7 @@ html, body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 1rem; /* default spacing below each panel */
+  margin-bottom: 1rem; 
 }
 
 /* 
@@ -130,7 +134,7 @@ html, body {
   We only remove bottom margin from the panel's last child to avoid internal empty space.
 */
 .presets-block > *:last-child {
-  margin-bottom: 0 !important; /* remove internal bottom margin from last child */
+  margin-bottom: 0 !important;
 }
 
 /* 
@@ -244,7 +248,7 @@ input:focus, textarea:focus, select:focus {
 
 /* 
   Base styling for all buttons:
-  Slightly smaller than before, at 0.9em font-size, 
+  Slightly smaller, at 0.9em font-size, 
   0.4em x 0.6em padding
 */
 button {
