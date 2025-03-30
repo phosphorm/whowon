@@ -215,7 +215,7 @@ function App() {
     maybeResetResults();
   };
 
-  // Promo preset
+  // Presets
   const handlePromoPreset = () => {
     setNumberOfWinners("2");
     setDuplicateMode("first");
@@ -223,7 +223,6 @@ function App() {
     setExactMatch(false);
     maybeResetResults();
   };
-  // Classic preset
   const handleClassicPreset = () => {
     setNumberOfWinners("1");
     setDuplicateMode("last");
@@ -231,7 +230,6 @@ function App() {
     setExactMatch(false);
     maybeResetResults();
   };
-  // Best of 3
   const handleBestOf3Preset = () => {
     setNumberOfWinners("2");
     setTieMode("all");
@@ -264,7 +262,6 @@ function App() {
 
   // The winners field glows if we have winners
   const winnersBoxClass = `field ${winners.length > 0 ? "winners-field" : ""}`;
-
   // If exactMatch => gray out numberOfWinners & tieMode fields (including labels).
   const disableSectionClass = exactMatch ? "disabled-section" : "";
 
@@ -480,11 +477,14 @@ function App() {
                   <button className="secondary-btn tooltip" onClick={handlePromoPreset}>
                     <span className="material-icons">local_offer</span>
                     Promo
-                    <span className="tooltiptext" style="white-space: pre;">
-                      Winners = 2<br/>
-                      Duplicates = Keep First<br/>
-                      Ties = First Answer<br/>
-                      Exact Match = Disabled
+                    <span
+                      className="tooltiptext"
+                      style={{ whiteSpace: "pre" }}
+                    >
+                      Winners = 2
+                      {"\n"}Duplicates = Keep First
+                      {"\n"}Ties = First Answer
+                      {"\n"}Exact Match = Disabled
                     </span>
                   </button>
 
@@ -492,11 +492,14 @@ function App() {
                   <button className="secondary-btn tooltip" onClick={handleClassicPreset}>
                     <span className="material-icons">history</span>
                     Classic
-                    <span className="tooltiptext" style="white-space: pre;">
-                      Winners = 1<br/>
-                      Duplicates = Keep Last<br/>
-                      Ties = Include Ties<br/>
-                      Exact Match = Disabled
+                    <span
+                      className="tooltiptext"
+                      style={{ whiteSpace: "pre" }}
+                    >
+                      Winners = 1
+                      {"\n"}Duplicates = Keep Last
+                      {"\n"}Ties = Include Ties
+                      {"\n"}Exact Match = Disabled
                     </span>
                   </button>
 
@@ -504,11 +507,14 @@ function App() {
                   <button className="secondary-btn tooltip" onClick={handleBestOf3Preset}>
                     <span className="material-icons">sports_score</span>
                     Best of 3
-                    <span className="tooltiptext" style="white-space: pre;">
-                      Winners = 2<br/>
-                      Duplicates = Keep First<br/>
-                      Ties = Include Ties<br/>
-                      Exact Match = Disabled
+                    <span
+                      className="tooltiptext"
+                      style={{ whiteSpace: "pre" }}
+                    >
+                      Winners = 2
+                      {"\n"}Duplicates = Keep First
+                      {"\n"}Ties = Include Ties
+                      {"\n"}Exact Match = Disabled
                     </span>
                   </button>
                 </div>

@@ -2,6 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 
+/**
+ * 1) Set the document title to "who won?"
+ * 2) Dynamically create a link element for the favicon (emoji_events trophy icon),
+ *    in green (#00ff00).
+ */
 document.title = "who won?";
 
 const trophySVG = encodeURIComponent(`
