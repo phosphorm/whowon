@@ -2,13 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-/* 
-  Fill the entire viewport so we can center content vertically as well as horizontally
-*/
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   overflow-x: hidden; /* Hide minor horizontal overflow if it occurs */
   background-color: #0d0d0d; /* nearly black background */
   color: #f0f0f0;
@@ -16,36 +12,20 @@ html, body {
   min-height: 100vh;
 }
 
-/* 
-  Outer container for vertical & horizontal centering.
-  If content exceeds the viewport, it scrolls. Otherwise, it's fully centered.
-*/
-.app-outer {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;  
-  align-items: center;      
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-/* 
-  The main .app container:
-  - up to 900px wide
-  - leftover horizontal centering is handled by .app-outer
-*/
+/* Main container: up to 900px wide, centered, with padding */
 .app {
   max-width: 900px;
-  width: 100%;
-  padding: 0.5rem;
+  margin: 0 auto;
+  padding: 1rem;
   position: relative;
   z-index: 0;
 }
 
-/* Subtle animated background gradient behind everything */
+/* Subtle animated background gradient behind everything,
+   using ::before so it doesn't affect layout. */
 .app::before {
   content: "";
-  position: fixed;
+  position: fixed; /* stays fixed in the viewport */
   top: 0;
   left: 0;
   width: 100%;
@@ -54,53 +34,64 @@ html, body {
   background: radial-gradient(circle at 50% 50%, rgba(0,255,0,0.07), transparent 70%);
   animation: subtleBg 10s ease-in-out infinite alternate;
 }
+
 @keyframes subtleBg {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.02); }
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.02);
+  }
 }
 
-/* Header: within .app, so it won't exceed columns */
+/* Header: non-sticky, wraps if space is tight */
 .header {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   background: #0f0f0f;
-  padding: 0.5rem 1rem; 
+  padding: 0.8rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  margin-bottom: 0.8rem;
 }
-.header .header-left {
+
+/* "who won?" heading plus trophy icon next to it */
+.header-left {
+  display: flex;
+  align-items: center;
   font-size: 1.2rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
 }
-.header .header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.trophy-icon {
+  color: #00ff00;
+  margin-left: 0.6rem;
+  font-size: 1.4rem; /* slightly bigger than normal text */
+}
+
+.header-right {
   font-size: 0.95rem;
   color: #aaa;
 }
-.header .header-right a {
+.header-right a {
   color: #aaa;
   text-decoration: none;
+  margin-left: 1rem;
   font-weight: 500;
   white-space: nowrap;
 }
-.header .header-right a:hover {
+.header-right a:hover {
   color: #fff;
 }
 
-/* Main content: two columns, smaller spacing. */
+/* Main layout: two columns that match in height */
 .content {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem;
   align-items: stretch;
-  padding-bottom: 1rem;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
 }
 .left, .right {
   flex: 1 1 0;
@@ -112,63 +103,44 @@ html, body {
   flex: 2 1 0; /* left panel is a bit wider */
 }
 
-/* Panels with smaller top/bottom padding, less margin-bottom. */
+/* Panels for input and output sections */
 .panel {
   background: #1a1a1a;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 1.5rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-bottom: 1rem; /* default spacing below each panel */
 }
 
-/* 
-  The .presets-block is also a .panel,
-  so it already has margin-bottom:1rem from .panel. 
-  We only remove bottom margin from the panel's last child to avoid internal empty space.
-*/
-.presets-block > *:last-child {
-  margin-bottom: 0 !important; /* remove internal bottom margin from last child */
-}
-
-/* 
-  Unified heading style for all sections (Inputs, Presets, Results).
-*/
-.section-title {
-  font-size: 1.2em;
-  margin: 0 0 0.8rem 0;
+/* Headings */
+h1, h2 {
+  margin: 0 0 0.5em;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
+}
+h1 {
+  font-size: 1.6em;
+}
+h2 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-top: 0;
 }
 
-/* Reorder .presets-block & .results-block on mobile */
-.results-block {
-  order: 1;
-}
-@media (max-width: 600px) {
-  .presets-block {
-    order: 1;
-  }
-  .results-block {
-    order: 0;
-  }
-}
-
-/* Form fields */
+/* Form field group */
 .field {
-  margin-bottom: 0.8rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
 }
 .field label {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   font-weight: 500;
   font-size: 0.95em;
   margin-bottom: 0.3em;
+  justify-content: space-between;
 }
 .field .material-icons {
   font-size: 18px;
@@ -176,29 +148,31 @@ html, body {
   cursor: help;
 }
 
-.label-with-icon {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
+/* 
+   .disabled-field: used to dim the entire label + icon + input 
+   whenever exactMatch is on for those fields
+*/
+.disabled-field label {
+  color: #888; /* dim label text */
 }
-
-/* Inline error text styling */
-.field-error {
-  color: #ff5555;
-  font-size: 0.85em;
-  margin-top: 0.2rem;
-  font-style: italic;
+.disabled-field .material-icons {
+  color: #666; /* also dim the info icon slightly */
+}
+.disabled-field select,
+.disabled-field input {
+  background-color: #333;
+  color: #888;
+  cursor: not-allowed;
 }
 
 /* Tooltip container */
 .tooltip {
   position: relative;
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
 }
 .tooltip .tooltiptext {
   visibility: hidden;
-  opacity: 1; 
+  opacity: 0;
   background-color: #333;
   color: #fff;
   text-align: left;
@@ -226,7 +200,7 @@ input, textarea, select {
   border: none;
   color: #f0f0f0;
   border-radius: 6px;
-  padding: 0.4em 0.6em; 
+  padding: 0.5em 0.8em;
   font-size: 1em;
   box-sizing: border-box;
   transition: box-shadow 0.3s, background-color 0.3s;
@@ -242,86 +216,62 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.5);
 }
 
-/* 
-  Base styling for all buttons:
-*/
-button {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9em;
-  font-weight: 600;   
+/* The small "field reset" button near the Raw Data label */
+.field-reset-btn {
+  background-color: #444;
+  color: #fff;
   border: none;
-  border-radius: 6px; 
-  padding: 0.4em 0.6em; 
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  font-size: 0.75rem; /* smaller font */
+  padding: 0.2rem 0.5rem; /* smaller padding */
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
   display: inline-flex;
   align-items: center;
-  gap: 0.3em;
+  height: 1.6rem; /* ensures it's the same height as input/label row */
+}
+.field-reset-btn:hover {
+  background-color: #555;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+.field-reset-btn:active {
+  background-color: #3a3a3a;
+}
+/* Add a tooltip for the small reset as well */
+.field-reset-btn .tooltiptext {
+  bottom: 140%;
+  right: 0; 
 }
 
-/* Primary Button: standard green background, hover/active states */
+/* Buttons */
+button {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+/* The main "Reset" and "Pick Winners" are bigger than the field-level reset. */
 .primary-btn {
   background-color: #008800;
   color: #ffffff;
+  font-size: 1em;
+  padding: 0.6em 1.2em;
 }
 .primary-btn:hover {
   background-color: #00aa00;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
 }
 .primary-btn:active {
   background-color: #007500;
 }
-
-/* pick-winners-wide modifies the primary-btn with an animated gradient. */
-.pick-winners-wide {
-  width: 100%;
-  min-height: 3rem;     
-  font-size: 1rem;      
-  justify-content: center; 
-  align-items: center;
-  border-radius: 6px;
-  background: linear-gradient(45deg, #008800, #00cc00, #008800);
-  background-size: 200% 200%;
-  animation: pickWinnersAnim 4s ease-in-out infinite alternate;
-}
-.pick-winners-wide:hover {
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
-}
-.pick-winners-wide:active {
-  background-position: 70% 50%;
-  box-shadow: none;
-}
-
-@keyframes pickWinnersAnim {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
-}
-
-/* Muted red for reset button */
-.reset-button {
-  width: 2rem;
-  height: 2rem;
-  justify-content: center;
-  border-radius: 6px;
-  background-color: #AA4444;
-  color: #ffffff;
-}
-.reset-button:hover {
-  background-color: #bb5555;
-  box-shadow: 0 0 8px rgba(255, 120, 120, 0.2);
-}
-.reset-button:active {
-  background-color: #993333;
-}
-
-/* Secondary button base */
 .secondary-btn {
   background-color: #444444;
   color: #ffffff;
+  font-size: 1em;
+  padding: 0.6em 1.2em;
 }
 .secondary-btn:hover {
   background-color: #555555;
@@ -331,88 +281,120 @@ button {
   background-color: #3a3a3a;
 }
 
-/* Instead of partial opacity, we use a more muted color for 
-   Original Messages and Name(s) & Difference
-*/
-.deprioritized {
-  color: #aaa;     
-  font-size: 0.9em;
+/* Preset Buttons - smaller than primary/secondary */
+.presets-container {
+  margin-bottom: 1rem; 
 }
-
-/* winners-field ring glow */
-.winners-field {
-  position: relative;
-  margin-bottom: 1rem;
-  padding: 0.8rem;
-}
-.winners-field::before {
-  content: "";
-  position: absolute;
-  top: -4px; left: -4px; 
-  right: -4px; bottom: -4px; 
-  border-radius: 8px;
-  border: 2px solid transparent;
-  pointer-events: none; 
-  animation: ringPulse 2.5s infinite;
-}
-@keyframes ringPulse {
-  0% {
-    box-shadow: 0 0 2px rgba(0,255,0,0.3);
-    border-color: rgba(0,255,0,0.3);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(0,255,0,0.6);
-    border-color: rgba(0,255,0,0.6);
-  }
-  100% {
-    box-shadow: 0 0 2px rgba(0,255,0,0.3);
-    border-color: rgba(0,255,0,0.3);
-  }
-}
-
-/* iOS-like toggle styling for toggles */
-.ios-toggle-container {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-}
-.ios-toggle {
-  position: relative;
-  display: inline-block;
-  width: 38px;
-  height: 22px;
-  border-radius: 11px;
-  background-color: #666;
-  transition: background-color 0.3s;
+.preset-btn {
+  background-color: #333333;
+  color: #ffffff;
+  font-size: 0.85em;
+  margin-right: 0.5rem;
+  padding: 0.4em 0.8em;
+  border-radius: 4px;
+  border: none;
   cursor: pointer;
 }
-.ios-toggle::before {
-  content: "";
+.preset-btn:hover {
+  background-color: #444444;
+  box-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
+}
+.preset-btn:active {
+  background-color: #2a2a2a;
+}
+
+/* iOS-style toggle for "Exact Match?" */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 42px; /* total width of the slider */
+  height: 24px; /* total height of the slider */
+  margin-left: 1rem;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
   position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 20px;
-  height: 20px;
-  border-radius: 20px;
-  background-color: #fff;
-  transition: transform 0.3s;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #444;
+  transition: .4s;
+  border-radius: 24px;
 }
-.ios-toggle.checked {
-  background-color: #008800;
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px; 
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
 }
-.ios-toggle.checked::before {
-  transform: translateX(16px);
+.toggle-switch input:checked + .slider {
+  background-color: #00aa00;
+}
+.toggle-switch input:focus + .slider {
+  box-shadow: 0 0 0 2px rgba(0,255,0,0.5);
+}
+.toggle-switch input:checked + .slider:before {
+  transform: translateX(18px);
 }
 
-/* Show disabled options when exact match is on */
-.disabled-section {
-  opacity: 0.3;
-  pointer-events: none;
+/* Results / output styling */
+.results {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.no-winners {
+  color: #888;
+  font-style: italic;
+}
+/* Visually de-prioritized sections */
+.deprioritized {
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+.results ul {
+  list-style: none;
+  padding-left: 1.2em;
+}
+.results li {
+  margin-bottom: 0.3em;
 }
 
-/* Smaller, less prominent timestamp */
-.timestamp {
-  font-size: 0.85em;
-  color: #bbb;
-  margin: 0.3rem 0 0.6rem 0; 
+/* 
+  Reordering fields on desktop vs. mobile if needed 
+  (carried over from previous instructions).
+*/
+.original-later {
+  order: 1;
+}
+.differences-later {
+  order: 2;
+}
+.winners-later {
+  order: 3;
+}
+
+/*
+  .winners-field is added dynamically if winners are picked,
+  giving the green outline & glow. 
+*/
+.winners-field {
+  border: 2px solid #00ff00;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  margin-bottom: 1.5rem;
+}
+.winners-field label {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
